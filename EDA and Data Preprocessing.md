@@ -1,7 +1,7 @@
 ---
 title: EDA and Data Preprocessing
 notebook: EDA and Data Preprocessing.ipynb
-nav_include: 2
+nav_include: 4
 ---
 
 ## Contents

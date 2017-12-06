@@ -1,6 +1,6 @@
 ---
 title: Literature Review
-nav_include: 3
+nav_include: 2
 ---
 
 ## Literature Review
