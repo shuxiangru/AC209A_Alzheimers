@@ -1,7 +1,7 @@
 ---
 title: Higher-level Models
 notebook: Higher-level Models.ipynb
-nav_include: 6
+nav_include: 7
 ---
 
 ## Contents

@@ -1,7 +1,7 @@
 ---
 title: Variable Selections and Significance of Predictors
 notebook: Variable Selections and Significance of Predictors.ipynb
-nav_include: 5
+nav_include: 6
 ---
 
 ## Contents
