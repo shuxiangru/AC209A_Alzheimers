@@ -359,7 +359,8 @@ print(inter_f_b)
 
 
 ## Rank-Rank plot 
-Rank vs rank of predictors generated from different selection procedures
+
+Rank of predictors generated from different selection procedures:
 
 
 
