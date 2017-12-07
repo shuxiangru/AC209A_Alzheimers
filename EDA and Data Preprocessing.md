@@ -38,7 +38,7 @@ adnimerge_unique.head()
 ```
 
 
-    (783, 88)
+    (783, 89)
 
 
 
@@ -64,6 +64,7 @@ adnimerge_unique.head()
       <th></th>
       <th>RID</th>
       <th>DX_bl</th>
+      <th>PTAGE</th>
       <th>PTGENDER</th>
       <th>PTEDUCAT</th>
       <th>PTRACCAT_Asian</th>
@@ -157,6 +158,7 @@ adnimerge_unique.head()
       <th>0</th>
       <td>4001</td>
       <td>2</td>
+      <td>88.5</td>
       <td>0</td>
       <td>9</td>
       <td>0</td>
@@ -248,6 +250,7 @@ adnimerge_unique.head()
       <th>1</th>
       <td>4004</td>
       <td>1</td>
+      <td>66.8</td>
       <td>0</td>
       <td>14</td>
       <td>0</td>
@@ -339,6 +342,7 @@ adnimerge_unique.head()
       <th>2</th>
       <td>4005</td>
       <td>1</td>
+      <td>70.5</td>
       <td>1</td>
       <td>16</td>
       <td>0</td>
@@ -430,6 +434,7 @@ adnimerge_unique.head()
       <th>3</th>
       <td>4007</td>
       <td>1</td>
+      <td>78.1</td>
       <td>1</td>
       <td>20</td>
       <td>0</td>
@@ -521,6 +526,7 @@ adnimerge_unique.head()
       <th>4</th>
       <td>4009</td>
       <td>2</td>
+      <td>90.3</td>
       <td>1</td>
       <td>17</td>
       <td>0</td>
@@ -619,9 +625,10 @@ adnimerge_unique.head()
 ```python
 cols_id = ['RID']
 cols_predictand = ['DX_bl']
-cols_demographic = [c for c in adnimerge_unique.columns if c.startswith('PT')]
-cols_cont_slope = [c for c in adnimerge_unique.columns if c.endswith('slope')]
-cols_cont_bl = [c.replace('_slope','') for c in cols_cont_slope]
+cols_demo_cont = ['PTAGE', 'PTEDUCAT']
+cols_demo_cata = [c for c in adnimerge_unique.columns if c.startswith('PT') and c not in cols_demo_cont]
+cols_longit_slope = [c for c in adnimerge_unique.columns if c.endswith('slope')]
+cols_longit_bl = [c.replace('_slope','') for c in cols_longit_slope]
 ```
 
 
@@ -665,45 +672,61 @@ Note: The percentage value in the legend indicates the percentage of data that i
 
 
 ```python
-num_cont_bl = len(cols_cont_bl)
+num_cont = 1 + len(cols_longit_bl)
 
 adnimerge_unique_CN = adnimerge_unique[adnimerge_unique['DX_bl']==0]
 adnimerge_unique_MC = adnimerge_unique[adnimerge_unique['DX_bl']==1]
 adnimerge_unique_AD = adnimerge_unique[adnimerge_unique['DX_bl']==2]
 
-fig, ax = plt.subplots(num_cont_bl, 2, figsize=(12,200))
+fig, ax = plt.subplots(num_cont, 2, figsize=(12,200))
 
-for i,col_name in enumerate(cols_cont_bl):
+for i,col_name in enumerate(cols_demo_cont):
     mis_rate_CN = np.mean(adnimerge_unique_CN[col_name].isnull())
     mis_rate_MC = np.mean(adnimerge_unique_MC[col_name].isnull())
     mis_rate_AD = np.mean(adnimerge_unique_AD[col_name].isnull())
     adnimerge_unique_CN[col_name].hist(
-        ax=ax[i,0], alpha=0.4, 
+        ax=ax[0,i], alpha=0.4, 
         label='{:^4} ({:0.0f}%)'.format('CN', 100*(1-mis_rate_CN)))
     adnimerge_unique_MC[col_name].hist(
-        ax=ax[i,0], alpha=0.4, 
+        ax=ax[0,i], alpha=0.4, 
         label='{:^4} ({:0.0f}%)'.format('CI', 100*(1-mis_rate_MC)))
     adnimerge_unique_AD[col_name].hist(
-        ax=ax[i,0], alpha=0.4, 
+        ax=ax[0,i], alpha=0.4, 
         label='{:^4} ({:0.0f}%)'.format('AD', 100*(1-mis_rate_AD)))
-    ax[i,0].set_title(col_name)
-    ax[i,0].legend(loc='best')
+    ax[0,i].set_title(col_name)
+    ax[0,i].legend(loc='best')
+
+for i,col_name in enumerate(cols_longit_bl):
+    mis_rate_CN = np.mean(adnimerge_unique_CN[col_name].isnull())
+    mis_rate_MC = np.mean(adnimerge_unique_MC[col_name].isnull())
+    mis_rate_AD = np.mean(adnimerge_unique_AD[col_name].isnull())
+    adnimerge_unique_CN[col_name].hist(
+        ax=ax[i+1,0], alpha=0.4, 
+        label='{:^4} ({:0.0f}%)'.format('CN', 100*(1-mis_rate_CN)))
+    adnimerge_unique_MC[col_name].hist(
+        ax=ax[i+1,0], alpha=0.4, 
+        label='{:^4} ({:0.0f}%)'.format('CI', 100*(1-mis_rate_MC)))
+    adnimerge_unique_AD[col_name].hist(
+        ax=ax[i+1,0], alpha=0.4, 
+        label='{:^4} ({:0.0f}%)'.format('AD', 100*(1-mis_rate_AD)))
+    ax[i+1,0].set_title(col_name)
+    ax[i+1,0].legend(loc='best')
     
-for i,col_name in enumerate(cols_cont_slope):
+for i,col_name in enumerate(cols_longit_slope):
     mis_rate_CN = np.mean(adnimerge_unique_CN[col_name].isnull())
     mis_rate_MC = np.mean(adnimerge_unique_MC[col_name].isnull())
     mis_rate_AD = np.mean(adnimerge_unique_AD[col_name].isnull())
     adnimerge_unique_CN[col_name].hist(
-        ax=ax[i,1], alpha=0.4, 
+        ax=ax[i+1,1], alpha=0.4, 
         label='{:^4} ({:0.0f}%)'.format('CN', 100*(1-mis_rate_CN)))
     adnimerge_unique_MC[col_name].hist(
-        ax=ax[i,1], alpha=0.4, 
+        ax=ax[i+1,1], alpha=0.4, 
         label='{:^4} ({:0.0f}%)'.format('CI', 100*(1-mis_rate_MC)))
     adnimerge_unique_AD[col_name].hist(
-        ax=ax[i,1], alpha=0.4, 
+        ax=ax[i+1,1], alpha=0.4, 
         label='{:^4} ({:0.0f}%)'.format('AD', 100*(1-mis_rate_AD)))
-    ax[i,1].set_title(col_name)
-    ax[i,1].legend(loc='best')
+    ax[i+1,1].set_title(col_name)
+    ax[i+1,1].legend(loc='best')
 ```
 
 
@@ -754,7 +777,8 @@ def plot_correlation_heatmap(df1, df2, ax):
 ```python
 fig, ax = plt.subplots(figsize=(15,12))
 plot = plot_correlation_heatmap(
-    adnimerge_unique[cols_cont_bl], adnimerge_unique[cols_cont_bl], ax)
+    adnimerge_unique[cols_demo_cont+cols_longit_bl], 
+    adnimerge_unique[cols_demo_cont+cols_longit_bl], ax)
 fig.colorbar(plot)
 ```
 
@@ -762,7 +786,7 @@ fig.colorbar(plot)
 
 
 
-    <matplotlib.colorbar.Colorbar at 0x1a1aad6d30>
+    <matplotlib.colorbar.Colorbar at 0x1a1cd7c588>
 
 
 
@@ -776,15 +800,15 @@ We listed the predictors that have a small slope in magnitude related to its val
 
 ```python
 tol_err = 1e-6
-cols_cont_slope_valid = []
-for cbl,csl in zip(cols_cont_bl,cols_cont_slope):
+cols_longit_slope_valid = []
+for cbl,csl in zip(cols_longit_bl,cols_longit_slope):
     bl = adnimerge_unique[cbl]
     sl = adnimerge_unique[csl]
     if np.std(sl) > tol_err*np.mean(bl):
-        cols_cont_slope_valid.append(csl)
-cols_cont_slope_invalid = [
-    c for c in cols_cont_slope if c not in cols_cont_slope_valid]
-print('Predictor slopes that are too small:\n', cols_cont_slope_invalid)
+        cols_longit_slope_valid.append(csl)
+cols_longit_slope_invalid = [
+    c for c in cols_longit_slope if c not in cols_longit_slope_valid]
+print('Predictor slopes that are too small:\n', cols_longit_slope_invalid)
 ```
 
 
@@ -797,8 +821,8 @@ print('Predictor slopes that are too small:\n', cols_cont_slope_invalid)
 ```python
 fig, ax = plt.subplots(figsize=(15,12))
 plot = plot_correlation_heatmap(
-    adnimerge_unique[cols_cont_slope_valid], 
-    adnimerge_unique[cols_cont_slope_valid], ax)
+    adnimerge_unique[cols_longit_slope_valid], 
+    adnimerge_unique[cols_longit_slope_valid], ax)
 fig.colorbar(plot)
 ```
 
@@ -806,7 +830,7 @@ fig.colorbar(plot)
 
 
 
-    <matplotlib.colorbar.Colorbar at 0x1a1accf3c8>
+    <matplotlib.colorbar.Colorbar at 0x1a1614fa20>
 
 
 
@@ -819,8 +843,8 @@ fig.colorbar(plot)
 ```python
 fig, ax = plt.subplots(figsize=(15,12))
 plot = plot_correlation_heatmap(
-    adnimerge_unique[cols_cont_bl[4:]], 
-    adnimerge_unique[cols_cont_slope[4:]], ax)
+    adnimerge_unique[cols_longit_slope[4:]],
+    adnimerge_unique[cols_demo_cont+cols_longit_bl], ax)
 fig.colorbar(plot)
 ```
 
@@ -828,7 +852,7 @@ fig.colorbar(plot)
 
 
 
-    <matplotlib.colorbar.Colorbar at 0x1a242bccc0>
+    <matplotlib.colorbar.Colorbar at 0x1a142a7550>
 
 
 
@@ -866,7 +890,7 @@ adnimerge_unique.head()
 ```
 
 
-    (783, 76)
+    (783, 77)
 
 
 
@@ -892,6 +916,7 @@ adnimerge_unique.head()
       <th></th>
       <th>RID</th>
       <th>DX_bl</th>
+      <th>PTAGE</th>
       <th>PTGENDER</th>
       <th>PTEDUCAT</th>
       <th>PTRACCAT_Asian</th>
@@ -973,6 +998,7 @@ adnimerge_unique.head()
       <th>0</th>
       <td>4001</td>
       <td>2</td>
+      <td>88.5</td>
       <td>0</td>
       <td>9</td>
       <td>0</td>
@@ -1052,6 +1078,7 @@ adnimerge_unique.head()
       <th>1</th>
       <td>4004</td>
       <td>1</td>
+      <td>66.8</td>
       <td>0</td>
       <td>14</td>
       <td>0</td>
@@ -1131,6 +1158,7 @@ adnimerge_unique.head()
       <th>2</th>
       <td>4005</td>
       <td>1</td>
+      <td>70.5</td>
       <td>1</td>
       <td>16</td>
       <td>0</td>
@@ -1210,6 +1238,7 @@ adnimerge_unique.head()
       <th>3</th>
       <td>4007</td>
       <td>1</td>
+      <td>78.1</td>
       <td>1</td>
       <td>20</td>
       <td>0</td>
@@ -1289,6 +1318,7 @@ adnimerge_unique.head()
       <th>4</th>
       <td>4009</td>
       <td>2</td>
+      <td>90.3</td>
       <td>1</td>
       <td>17</td>
       <td>0</td>
@@ -1391,7 +1421,7 @@ def imputation_mean(df, cols):
 
 
 ```python
-cols_to_impute = cols_cont_bl + cols_cont_slope_valid
+cols_to_impute = cols_longit_bl + cols_longit_slope_valid
 adnimerge_unique_imputed = imputation_mean(adnimerge_unique, cols_to_impute)
 adnimerge_unique_imputed.head()
 ```
@@ -1420,6 +1450,7 @@ adnimerge_unique_imputed.head()
       <th></th>
       <th>RID</th>
       <th>DX_bl</th>
+      <th>PTAGE</th>
       <th>PTGENDER</th>
       <th>PTEDUCAT</th>
       <th>PTRACCAT_Asian</th>
@@ -1501,6 +1532,7 @@ adnimerge_unique_imputed.head()
       <th>0</th>
       <td>4001</td>
       <td>2</td>
+      <td>88.5</td>
       <td>0</td>
       <td>9</td>
       <td>0</td>
@@ -1580,6 +1612,7 @@ adnimerge_unique_imputed.head()
       <th>1</th>
       <td>4004</td>
       <td>1</td>
+      <td>66.8</td>
       <td>0</td>
       <td>14</td>
       <td>0</td>
@@ -1659,6 +1692,7 @@ adnimerge_unique_imputed.head()
       <th>2</th>
       <td>4005</td>
       <td>1</td>
+      <td>70.5</td>
       <td>1</td>
       <td>16</td>
       <td>0</td>
@@ -1738,6 +1772,7 @@ adnimerge_unique_imputed.head()
       <th>3</th>
       <td>4007</td>
       <td>1</td>
+      <td>78.1</td>
       <td>1</td>
       <td>20</td>
       <td>0</td>
@@ -1817,6 +1852,7 @@ adnimerge_unique_imputed.head()
       <th>4</th>
       <td>4009</td>
       <td>2</td>
+      <td>90.3</td>
       <td>1</td>
       <td>17</td>
       <td>0</td>
@@ -1914,12 +1950,14 @@ print(df_test.shape)
 ```
 
 
-    (621, 76)
-    (162, 76)
+    (621, 77)
+    (162, 77)
 
 
 
 
 ```python
+df_train.to_csv('data/ADNIMERGE_train.csv', index=False)
+df_test.to_csv('data/ADNIMERGE_test.csv', index=False)
 ```
 

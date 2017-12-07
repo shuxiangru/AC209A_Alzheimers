@@ -25,7 +25,7 @@ pd.set_option('display.max_columns', 100)
 
 ## Merge
 
-We analyzed the data collected under both ADNI1 and ADNI2 protocol and found that the missing rate was extremely high for many important predictors in ADNI1. Even though we have slightly more observations (819 patients) under ADNI1 protocol, ADNI2 data for patients (783 patients) is more complete.  Thus, we decided to base our model only on the data collected under ADNI2 protocol. 
+We analyzed the data collected under both ADNI1 and ADNI2 protocol and found that the missing rate was extremely high for many important predictors in ADNI1. Even though we have slightly more observations (819 patients) under ADNI1 protocol, ADNI2 data for patients (789 patients) is more complete.  Thus, we decided to base our model only on the data collected under ADNI2 protocol. 
 
 Biomarkers may exist before clinical symptoms arise, and they could help us predict the onslaught of Alzheimer’s disease. To include more information about biomarkers, we merged the data in ADNIMERGE with UPenn CSF biomarkers. This file contains three biomarkers, `CSF_ABETA`, `CSF_TAU` and `CSF_PTAU`.
 
@@ -1866,7 +1866,7 @@ adnimerge_unique.head()
 
 
 ```python
-cols_continuous = [
+cols_longit = [
     'APOE4', 'CSF_ABETA', 'CSF_TAU', 'CSF_PTAU', 
     'FDG', 'AV45', 'CDRSB', 'ADAS11', 'ADAS13', 'MMSE',
     'RAVLT_immediate', 'RAVLT_learning', 'RAVLT_forgetting',
@@ -1876,14 +1876,14 @@ cols_continuous = [
     'EcogSPOrgan', 'EcogSPDivatt', 'EcogSPTotal', 'FAQ', 'Ventricles',
     'Hippocampus', 'WholeBrain', 'Entorhinal', 'Fusiform', 'MidTemp', 'ICV']
 
-for c in cols_continuous:
+for c in cols_longit:
     adnimerge_unique[c+'_slope'] = np.full(adnimerge_unique.shape[0], np.nan)
     
 for rid in adnimerge_unique.index:
     rows_clean = adnimerge_clean[adnimerge_clean['RID']==rid]
     if rows_clean.shape[0] <= 1:
         continue
-    for c in cols_continuous:
+    for c in cols_longit:
         if np.isnan(adnimerge_unique.loc[rid, c]):
             continue
         elif np.prod(np.isnan(rows_clean[c].values[1:])) == 1:
@@ -1899,7 +1899,7 @@ for rid in adnimerge_unique.index:
 
 ## Rearrange and Export
 
-We have 783 observations, one for each patient. To improve readablity, we ordered the columns in a way that the slope of a predictor follows the predictor itself. We output the data to a csv file for further analysis and modeling.
+After initial date cleaning, we have 783 observations, one for each patient. To improve readablity, we ordered the columns in a way that the slope of a predictor follows the predictor itself. We output the data to a csv file for further analysis and modeling.
 
 
 
@@ -1907,18 +1907,19 @@ We have 783 observations, one for each patient. To improve readablity, we ordere
 cols_pt = [c for c in adnimerge_unique.columns if c.startswith('PT')]
 cols_slope = [c for c in adnimerge_unique.columns if c.endswith('slope')]
 cols_contwithslope = [] 
-for pair in zip(cols_continuous, cols_slope):
+for pair in zip(cols_longit, cols_slope):
     cols_contwithslope += pair
 
-cols_reordered = ['RID','DX_bl'] + cols_pt + cols_contwithslope
+cols_reordered = ['RID','DX_bl','AGE'] + cols_pt + cols_contwithslope
 adnimerge_unique = adnimerge_unique[cols_reordered]
+adnimerge_unique = adnimerge_unique.rename(columns={'AGE':'PTAGE'})
 
 print(adnimerge_unique.shape)
 adnimerge_unique.head()
 ```
 
 
-    (783, 88)
+    (783, 89)
 
 
 
@@ -1944,6 +1945,7 @@ adnimerge_unique.head()
       <th></th>
       <th>RID</th>
       <th>DX_bl</th>
+      <th>PTAGE</th>
       <th>PTGENDER</th>
       <th>PTEDUCAT</th>
       <th>PTRACCAT_Asian</th>
@@ -2037,6 +2039,7 @@ adnimerge_unique.head()
       <th>4001</th>
       <td>4001</td>
       <td>2</td>
+      <td>88.5</td>
       <td>0</td>
       <td>9</td>
       <td>0</td>
@@ -2128,6 +2131,7 @@ adnimerge_unique.head()
       <th>4004</th>
       <td>4004</td>
       <td>1</td>
+      <td>66.8</td>
       <td>0</td>
       <td>14</td>
       <td>0</td>
@@ -2219,6 +2223,7 @@ adnimerge_unique.head()
       <th>4005</th>
       <td>4005</td>
       <td>1</td>
+      <td>70.5</td>
       <td>1</td>
       <td>16</td>
       <td>0</td>
@@ -2310,6 +2315,7 @@ adnimerge_unique.head()
       <th>4007</th>
       <td>4007</td>
       <td>1</td>
+      <td>78.1</td>
       <td>1</td>
       <td>20</td>
       <td>0</td>
@@ -2401,6 +2407,7 @@ adnimerge_unique.head()
       <th>4009</th>
       <td>4009</td>
       <td>2</td>
+      <td>90.3</td>
       <td>1</td>
       <td>17</td>
       <td>0</td>
