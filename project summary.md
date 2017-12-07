@@ -31,12 +31,14 @@ Other significant demographic factors are age, marital status, race and ethnicit
 
 ### Conclusion Tables
 #### Advice on Tests
+
 | Advice                                | Tests                                                                                  |
-|---------------------------------------|----------------------------------------------------------------------------------------|
+|--------------------------------------:| --------------------------------------------------------------------------------------:|
 | Tests not needed                      | MOCA                                                                                   |
 | Tests only needed for the first visit | MMSE, ADAS13, FAQ, CSF(TAU),  EcogPtMem, EcogPtLang,  EcogSPPlan, EcogSPMem            |
 | Test needed for each following visit  | AV45, RAVLT(perc_forgetting),  FDG, EcogSPLang MRI(WholeBrain, MidTemp, Fusiform, ICV) |
 | Tests selected by all models          | MMSE                                                             
+
 
 #### Predictor Dictionary
 

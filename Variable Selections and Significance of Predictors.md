@@ -359,6 +359,7 @@ print(inter_f_b)
 
 
 ## Rank-Rank plot 
+Rank vs rank of predictors generated from different selection procedures
 
 
 
@@ -494,11 +495,11 @@ rf_score
 
 Since the test result of variables selected from only bootstrapping does not perform as well as that of the combined significant variables, we choose to rely on the significant predictors selected by the union of the forward and backward selections. Let's interpret the selected predictors:
 
-- The tests completely excluded are: `FDG`, and `MOCA`, indicating the results of those tests are not significant in the diagnosis, possibly because other assessments are testing similar aspects of the patients.
+- The tests completely excluded is `MOCA`, indicating the results of this test are not significant in the diagnosis, possibly because other assessments are testing similar aspects of the patients.
 
 - The factors that are significant themselves but insignificant in their slopes are: `MMSE`, `EcogSPMem`, `ADAS13`, `EcogPtMem`, `CSF_TAU`, `FAQ`, `EcogPtLang`, and `EcogSPPlan`, so tests associated with these factors only need to be done once at the baseline visit and are not necessary in the following visits. Specifically, Mini-Mental State Examination(`MMSE`), Everyday Cognition test on Participant Memory and Language, Study Partner Memory and Plan(`EcogSPMem`, `EcogPtMem`,`EcogPtLang`,`EcogSPPlan`), Functional Activities Questionnaire in Older Adults with Dementia(`FAQ`), Alzheimer’s Disease Assessment Scale(`ADAS13`) and biosample test(`CSF_TAU`) only need to be checked at the first visit.
 
-- The factors that are significant in their slopes are: `AV45_slope`, `EcogSPLang_slope`, `WholeBrain_slope`, `MidTemp_slope`, `Fusiform_slope`, `FDG_slope`, `RAVLT_perc_forgetting_slope` and `ICV_slope`, which mean that the change in these parameters within two years after the first visit is quite important for the diagnosis. So checking these parameters on each subsequent visit is necessary. Specifically, The tests that need to be conducted in every visit are **Ecog** (Everyday Cognition)test on study partner language, **AV45** test, **FDG** imaging test, **RAVLT_learning** test and **MRI** test.
+- The factors that are significant in their slopes are: `AV45_slope`, `EcogSPLang_slope`, `WholeBrain_slope`, `MidTemp_slope`, `Fusiform_slope`, `FDG_slope`, `RAVLT_perc_forgetting_slope` and `ICV_slope`, which mean that the change in these parameters within two years after the first visit is quite important for the diagnosis. So checking these parameters on each subsequent visit is necessary. Specifically, The tests that need to be conducted in every visit are **Ecog** (Everyday Cognition) test on study partner language, **AV45** PET test, **FDG** PET test, **RAVLT_learning** test and **MRI** test.
 
 - Other significant demographic factors are: `PTAGE`(age), `PTMARRY_Married`, `PTMARRY_Never_married` (marital status), `PTETHCAT_Not_Hisp/Latino`, `PTRACCAT_Unknown`, and `PTRACCAT_Hawaiian/Other_PI` (ethnicity and race). 
 
