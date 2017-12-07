@@ -1,7 +1,7 @@
 ---
 title: EDA and Data Preprocessing
 notebook: EDA and Data Preprocessing.ipynb
-nav_include: 4
+nav_include: 3
 ---
 
 ## Contents
@@ -652,7 +652,7 @@ print('other patients:', num_other)
 
 ## Histogram
 
-We plotted histograms for each predictor to look at the distribution of each category. We would like to know the relationship of each variable and the diagnosis. In addition, we would like to know how much data is missing in each category of diagnosis and find the best imputing method based on the result.
+We plotted histograms for each predictor to look at the distribution of each category. To better classify Alzheimer's Disease, we would like to know the relationship of each variable and the diagnosis. In addition, we would like to know how much data is missing in each category of diagnosis and find the best imputing method based on the result.
 
 Here are some noteworthy findings:
 - `CDRSB`: All the cognitive normal `CN` patients have a value close to 0. As the value increases, it is more likely that the patient has Alzheimer’s disease. Cognitive impairment and Alzheimer’s Disease `AD` patients can have different values for these two variables. That shows if the value is not 0, then the patient is experiencing some sort of dementia. This could be a very strong predictor. However, `CDRSB` is actively used to deduce DX and will erroneously inflate accuracy. We decided to delete this variable along with its slope.
@@ -660,7 +660,7 @@ Here are some noteworthy findings:
 - `RAVLT_immediate` and `Hippocampus` have negative relationship with Alzheimer’s. As the value of these variables decreases, it is more likely to get AD.
 - The missing rate is very low overall. For the predictors that have missing values, the precentage of missing value is similar across each category.
 
-* The percentage value in the legend indicates the percentage of data that is not missing in each category
+Note: The percentage value in the legend indicates the percentage of data that is not missing in each category
 
 
 
@@ -719,7 +719,7 @@ According to the heap map of all selected predictors, there are high correlation
 pairs of predictors: `CDRSB` vs `FAQ`, `ADAS11` vs `ADAS13`, `WholeBrain` vs `ICV`, and among all
 `EcogXXX` predictors. To deal with these correlations, we deleted `ADAS11`, `EcogPtTotal` and `EcogSPTotal` based on the review of scientific papers that investigate the importance of the factors mentioned above related to the prediction of Alzheimer’s Disease. 
 
-* The heatmap is obtained by only considering the value that are not None in both predictors.
+Note: The heatmap is obtained by only considering the value that are not None in both predictors.
 
 
 
@@ -744,7 +744,7 @@ def plot_correlation_heatmap(df1, df2, ax):
     ax.set_yticks(ticks=range(len(df1.columns)))
     ax.set_xticklabels(df2.columns, rotation='vertical')
     ax.set_yticklabels(df1.columns)
-    plot = ax.pcolor(np.abs(corr_matrix))
+    plot = ax.pcolor(np.abs(corr_matrix), vmin=0, vmax=1)
     return plot
 ```
 
@@ -762,7 +762,7 @@ fig.colorbar(plot)
 
 
 
-    <matplotlib.colorbar.Colorbar at 0x1a256d5438>
+    <matplotlib.colorbar.Colorbar at 0x1a1c54fcc0>
 
 
 
@@ -806,7 +806,7 @@ fig.colorbar(plot)
 
 
 
-    <matplotlib.colorbar.Colorbar at 0x1a1d92a7f0>
+    <matplotlib.colorbar.Colorbar at 0x1a14321cf8>
 
 
 
@@ -828,7 +828,7 @@ fig.colorbar(plot)
 
 
 
-    <matplotlib.colorbar.Colorbar at 0x1a27e16dd8>
+    <matplotlib.colorbar.Colorbar at 0x1a1ec92cc0>
 
 
 
@@ -1921,7 +1921,5 @@ print(df_test.shape)
 
 
 ```python
-df_train.to_csv('data/ADNIMERGE_train.csv', index=False)
-df_test.to_csv('data/ADNIMERGE_test.csv', index=False)
 ```
 
