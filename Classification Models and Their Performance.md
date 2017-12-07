@@ -14,6 +14,15 @@ nav_include: 5
 ```python
 import numpy as np
 import pandas as pd
+pd.set_option('display.width', 500)
+pd.set_option('display.max_columns', 100)
+import matplotlib
+import matplotlib.pyplot as plt
+%matplotlib inline
+import seaborn as sns
+sns.set_style('white')
+sns.set_context('paper', font_scale=1.5)
+
 from sklearn.dummy import DummyClassifier
 from sklearn.linear_model import LogisticRegressionCV
 from sklearn.linear_model import LogisticRegression
@@ -29,6 +38,7 @@ from sklearn.ensemble import AdaBoostClassifier
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import KFold
 from sklearn.metrics import confusion_matrix
+
 import warnings
 warnings.filterwarnings('ignore')
 ```
@@ -95,7 +105,7 @@ dc_score = score(dc, X_train, y_train, X_test, y_test)
 
 ## Logistic Regression
 
-We tested 6 kinds of logistic regression, logistic regression with l1 penalty, logistic regression with l2 penalty, unweighted logistic regression, weighted logistic regression, one-vs-rest logistic regression and multinomial logistic regression. We chose the best parameters with cross validation. We found that unless we used weighted logistic regression, we need a large regularization term. However, the accuracy of weighted logistic regression is very low compared to the others. That indicates that we have too many variables.
+We tested 6 kinds of logistic regression, logistic regression with l1 penalty, logistic regression with l2 penalty, unweighted logistic regression, weighted logistic regression, one-vs-rest logistic regression and multinomial logistic regression. We chose the best parameters with cross validation. We found that a large regularization term is needed for all classifiers, indicating that we have too many variables.
 
 
 
@@ -137,12 +147,12 @@ print("Multinomial logistic regression: ", log_multinomial.C_[0])
 
     Regularization strength: 
     -------------------------
-    Logistic regression with l1 penalty: 2.78255940221
+    Logistic regression with l1 penalty: 0.35938136638
     Logistic regression with l2 penalty: 0.35938136638
     Unweighted logistic regression:  0.35938136638
-    Weighted logistic regression:  166.81005372
+    Weighted logistic regression:  0.00599484250319
     OVR logistic regression:  0.35938136638
-    Multinomial logistic regression:  21.5443469003
+    Multinomial logistic regression:  2.78255940221
 
 
 
@@ -174,22 +184,22 @@ print('Multinomial Logistic Regression test Score: ',log_multinomial.score(X_tes
 
     Training accuracy
     -------------------------------------------------
-    Logistic Regression with l1 penalty train Score:  0.82769726248
-    Logistic Regression with l2 penalty train Score:  0.615136876006
-    Unweighted Logistic Regression with train Score:  0.615136876006
-    Weighted Logistic Regression train Score:  0.478260869565
-    OVR Logistic Regression train Score:  0.615136876006
-    Multinomial Logistic Regression train Score:  0.843800322061
+    Logistic Regression with l1 penalty train Score:  0.830917874396
+    Logistic Regression with l2 penalty train Score:  0.610305958132
+    Unweighted Logistic Regression with train Score:  0.610305958132
+    Weighted Logistic Regression train Score:  0.471819645733
+    OVR Logistic Regression train Score:  0.610305958132
+    Multinomial Logistic Regression train Score:  0.845410628019
     
     
     Test accuracy
     -------------------------------------------------
-    Logistic Regression with l1 penalty test Score:  0.783950617284
-    Logistic Regression with l2 penalty test Score:  0.586419753086
-    Unweighted Logistic Regression test Score:  0.586419753086
-    Weighted Logistic Regression test Score:  0.388888888889
-    OVR Logistic Regression test Score:  0.586419753086
-    Multinomial Logistic Regression test Score:  0.753086419753
+    Logistic Regression with l1 penalty test Score:  0.827160493827
+    Logistic Regression with l2 penalty test Score:  0.592592592593
+    Unweighted Logistic Regression test Score:  0.592592592593
+    Weighted Logistic Regression test Score:  0.407407407407
+    OVR Logistic Regression test Score:  0.592592592593
+    Multinomial Logistic Regression test Score:  0.796296296296
 
 
 
@@ -232,28 +242,28 @@ print("Multinomial Logistic Regression:\n",
 
     Confusion Matrix
     Logistic Regression with l1 penalty:
-     [[24 18  0]
-     [10 80  3]
+     [[27 15  0]
+     [ 5 84  4]
      [ 0  4 23]]
     Logistic Regression with l2 penalty:
      [[ 0 42  0]
-     [ 0 85  8]
+     [ 0 86  7]
      [ 0 17 10]]
     Unweighted Logistic Regression:
      [[ 0 42  0]
-     [ 0 85  8]
+     [ 0 86  7]
      [ 0 17 10]]
     Weighted Logistic Regression:
-     [[32  6  4]
-     [52 13 28]
-     [ 2  7 18]]
+     [[33  6  3]
+     [53 14 26]
+     [ 2  6 19]]
     OVR Logistic Regression:
      [[ 0 42  0]
-     [ 0 85  8]
+     [ 0 86  7]
      [ 0 17 10]]
     Multinomial Logistic Regression:
      [[28 14  0]
-     [17 71  5]
+     [10 78  5]
      [ 0  4 23]]
 
 
@@ -266,7 +276,8 @@ We performed normalization on continuous predictors and used Linear Discriminant
 ```python
 cols_standardize = [
     c for c in X_train.columns 
-    if (not c.startswith('PT')) or (c=='PTEDUCAT')]
+    if (not c.startswith('PT')) \
+        or (c=='PTEDUCAT') or (c=='PTAGE')]
 
 X_train_std = X_train.copy()
 X_test_std = X_test.copy()
@@ -307,6 +318,7 @@ X_train_std.head()
   <thead>
     <tr style="text-align: right;">
       <th></th>
+      <th>PTAGE</th>
       <th>PTGENDER</th>
       <th>PTEDUCAT</th>
       <th>PTRACCAT_Asian</th>
@@ -317,7 +329,60 @@ X_train_std.head()
       <th>PTRACCAT_White</th>
       <th>PTETHCAT_Not_Hisp/Latino</th>
       <th>PTMARRY_Married</th>
-      <th>...</th>
+      <th>PTMARRY_Never_married</th>
+      <th>PTMARRY_Widowed</th>
+      <th>APOE4</th>
+      <th>CSF_ABETA</th>
+      <th>CSF_TAU</th>
+      <th>CSF_PTAU</th>
+      <th>FDG</th>
+      <th>FDG_slope</th>
+      <th>AV45</th>
+      <th>AV45_slope</th>
+      <th>ADAS13</th>
+      <th>ADAS13_slope</th>
+      <th>MMSE</th>
+      <th>MMSE_slope</th>
+      <th>RAVLT_immediate</th>
+      <th>RAVLT_immediate_slope</th>
+      <th>RAVLT_learning</th>
+      <th>RAVLT_learning_slope</th>
+      <th>RAVLT_forgetting</th>
+      <th>RAVLT_forgetting_slope</th>
+      <th>RAVLT_perc_forgetting</th>
+      <th>RAVLT_perc_forgetting_slope</th>
+      <th>MOCA</th>
+      <th>MOCA_slope</th>
+      <th>EcogPtMem</th>
+      <th>EcogPtMem_slope</th>
+      <th>EcogPtLang</th>
+      <th>EcogPtLang_slope</th>
+      <th>EcogPtVisspat</th>
+      <th>EcogPtVisspat_slope</th>
+      <th>EcogPtPlan</th>
+      <th>EcogPtPlan_slope</th>
+      <th>EcogPtOrgan</th>
+      <th>EcogPtOrgan_slope</th>
+      <th>EcogPtDivatt</th>
+      <th>EcogPtDivatt_slope</th>
+      <th>EcogSPMem</th>
+      <th>EcogSPMem_slope</th>
+      <th>EcogSPLang</th>
+      <th>EcogSPLang_slope</th>
+      <th>EcogSPVisspat</th>
+      <th>EcogSPVisspat_slope</th>
+      <th>EcogSPPlan</th>
+      <th>EcogSPPlan_slope</th>
+      <th>EcogSPOrgan</th>
+      <th>EcogSPOrgan_slope</th>
+      <th>EcogSPDivatt</th>
+      <th>EcogSPDivatt_slope</th>
+      <th>FAQ</th>
+      <th>FAQ_slope</th>
+      <th>Ventricles</th>
+      <th>Ventricles_slope</th>
+      <th>Hippocampus</th>
+      <th>Hippocampus_slope</th>
       <th>WholeBrain</th>
       <th>WholeBrain_slope</th>
       <th>Entorhinal</th>
@@ -333,6 +398,7 @@ X_train_std.head()
   <tbody>
     <tr>
       <th>0</th>
+      <td>2.208480</td>
       <td>0</td>
       <td>-2.852257</td>
       <td>0</td>
@@ -343,7 +409,60 @@ X_train_std.head()
       <td>1</td>
       <td>1</td>
       <td>0</td>
-      <td>...</td>
+      <td>0</td>
+      <td>1</td>
+      <td>-0.823084</td>
+      <td>-1.421715</td>
+      <td>1.137347</td>
+      <td>-0.321586</td>
+      <td>-0.833130</td>
+      <td>0.811782</td>
+      <td>1.257634</td>
+      <td>0.023763</td>
+      <td>2.140034</td>
+      <td>0.236256</td>
+      <td>-2.742373</td>
+      <td>-0.471665</td>
+      <td>-0.010026</td>
+      <td>-0.001926</td>
+      <td>0.003844</td>
+      <td>-0.000699</td>
+      <td>0.028414</td>
+      <td>-0.018332</td>
+      <td>0.019484</td>
+      <td>-0.012471</td>
+      <td>-0.003150</td>
+      <td>-0.004052</td>
+      <td>-0.827740</td>
+      <td>1.136728</td>
+      <td>-0.981277</td>
+      <td>-0.002156</td>
+      <td>-0.715234</td>
+      <td>-0.030329</td>
+      <td>-0.713577</td>
+      <td>-0.002410</td>
+      <td>-0.843488</td>
+      <td>-0.007633</td>
+      <td>-1.076964</td>
+      <td>-0.016544</td>
+      <td>1.929076</td>
+      <td>-0.088208</td>
+      <td>-0.844339</td>
+      <td>0.954666</td>
+      <td>1.066767</td>
+      <td>1.048123</td>
+      <td>2.524016</td>
+      <td>0.060641</td>
+      <td>2.287022</td>
+      <td>0.021430</td>
+      <td>2.330806</td>
+      <td>-0.631242</td>
+      <td>2.934694</td>
+      <td>0.124173</td>
+      <td>-0.205919</td>
+      <td>0.381384</td>
+      <td>-1.351616</td>
+      <td>0.022285</td>
       <td>-1.761500</td>
       <td>-0.567555</td>
       <td>-0.820814</td>
@@ -357,6 +476,7 @@ X_train_std.head()
     </tr>
     <tr>
       <th>1</th>
+      <td>0.759714</td>
       <td>1</td>
       <td>1.376909</td>
       <td>0</td>
@@ -367,7 +487,60 @@ X_train_std.head()
       <td>1</td>
       <td>1</td>
       <td>1</td>
-      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.703236</td>
+      <td>-0.567568</td>
+      <td>-0.086517</td>
+      <td>-0.128000</td>
+      <td>0.602793</td>
+      <td>2.864460</td>
+      <td>1.903103</td>
+      <td>1.199280</td>
+      <td>-0.210782</td>
+      <td>-0.364551</td>
+      <td>0.586715</td>
+      <td>0.595629</td>
+      <td>0.202187</td>
+      <td>-0.189405</td>
+      <td>0.884055</td>
+      <td>-0.907178</td>
+      <td>-0.118596</td>
+      <td>1.750365</td>
+      <td>-0.556812</td>
+      <td>1.770545</td>
+      <td>0.227228</td>
+      <td>-0.044392</td>
+      <td>-0.827740</td>
+      <td>-0.229483</td>
+      <td>-1.153377</td>
+      <td>-0.000458</td>
+      <td>-0.444998</td>
+      <td>-0.101471</td>
+      <td>-0.713577</td>
+      <td>-0.065235</td>
+      <td>-0.843488</td>
+      <td>-0.064451</td>
+      <td>-1.076964</td>
+      <td>-0.072474</td>
+      <td>0.573694</td>
+      <td>-0.738447</td>
+      <td>-0.106940</td>
+      <td>-1.151805</td>
+      <td>0.487637</td>
+      <td>-1.687565</td>
+      <td>1.262926</td>
+      <td>-2.477232</td>
+      <td>0.148179</td>
+      <td>-1.526413</td>
+      <td>0.971872</td>
+      <td>-1.384981</td>
+      <td>-0.484392</td>
+      <td>-0.424658</td>
+      <td>-0.053348</td>
+      <td>-0.251084</td>
+      <td>0.483644</td>
+      <td>-0.306894</td>
       <td>-0.134464</td>
       <td>-0.028641</td>
       <td>-0.070387</td>
@@ -381,6 +554,7 @@ X_train_std.head()
     </tr>
     <tr>
       <th>2</th>
+      <td>-0.257208</td>
       <td>0</td>
       <td>0.607970</td>
       <td>0</td>
@@ -391,7 +565,60 @@ X_train_std.head()
       <td>1</td>
       <td>1</td>
       <td>1</td>
-      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>-0.823084</td>
+      <td>-0.775573</td>
+      <td>-1.038657</td>
+      <td>-0.920353</td>
+      <td>0.572072</td>
+      <td>0.019993</td>
+      <td>0.547072</td>
+      <td>0.023763</td>
+      <td>-0.798486</td>
+      <td>-0.710060</td>
+      <td>0.586715</td>
+      <td>0.463914</td>
+      <td>1.183334</td>
+      <td>1.011032</td>
+      <td>0.884055</td>
+      <td>-0.590705</td>
+      <td>0.280068</td>
+      <td>-1.497230</td>
+      <td>-0.495770</td>
+      <td>-1.722958</td>
+      <td>0.452935</td>
+      <td>0.701979</td>
+      <td>-0.530055</td>
+      <td>-0.049247</td>
+      <td>-0.464974</td>
+      <td>-0.085273</td>
+      <td>-0.715234</td>
+      <td>-0.033968</td>
+      <td>-0.713577</td>
+      <td>-0.065235</td>
+      <td>-0.018265</td>
+      <td>0.055382</td>
+      <td>-0.053520</td>
+      <td>0.069781</td>
+      <td>-1.052764</td>
+      <td>0.042214</td>
+      <td>-0.844339</td>
+      <td>-0.077852</td>
+      <td>-0.670610</td>
+      <td>-0.211993</td>
+      <td>-0.754818</td>
+      <td>0.111691</td>
+      <td>-0.824015</td>
+      <td>-0.212459</td>
+      <td>-0.930635</td>
+      <td>0.246899</td>
+      <td>-0.647205</td>
+      <td>-0.415515</td>
+      <td>-0.294977</td>
+      <td>-0.883418</td>
+      <td>-1.104796</td>
+      <td>0.020857</td>
       <td>-1.300396</td>
       <td>0.310720</td>
       <td>0.456478</td>
@@ -405,6 +632,7 @@ X_train_std.head()
     </tr>
     <tr>
       <th>3</th>
+      <td>-0.521887</td>
       <td>0</td>
       <td>-0.160970</td>
       <td>0</td>
@@ -415,7 +643,60 @@ X_train_std.head()
       <td>1</td>
       <td>1</td>
       <td>0</td>
-      <td>...</td>
+      <td>0</td>
+      <td>0</td>
+      <td>-0.823084</td>
+      <td>-0.445863</td>
+      <td>0.222762</td>
+      <td>0.322200</td>
+      <td>0.441716</td>
+      <td>0.850276</td>
+      <td>-0.548541</td>
+      <td>-0.049974</td>
+      <td>-0.994388</td>
+      <td>-0.282924</td>
+      <td>0.586715</td>
+      <td>0.519651</td>
+      <td>0.730497</td>
+      <td>0.190865</td>
+      <td>-0.546632</td>
+      <td>0.454839</td>
+      <td>-0.915923</td>
+      <td>1.164759</td>
+      <td>-1.032937</td>
+      <td>0.965802</td>
+      <td>0.678642</td>
+      <td>0.204009</td>
+      <td>0.387783</td>
+      <td>0.167724</td>
+      <td>0.223444</td>
+      <td>0.375527</td>
+      <td>-0.174781</td>
+      <td>0.049689</td>
+      <td>-0.007973</td>
+      <td>0.191936</td>
+      <td>0.531879</td>
+      <td>0.404523</td>
+      <td>1.652218</td>
+      <td>0.250482</td>
+      <td>-0.103997</td>
+      <td>-0.010217</td>
+      <td>-0.844339</td>
+      <td>-0.186429</td>
+      <td>-0.670610</td>
+      <td>-0.271617</td>
+      <td>-0.754818</td>
+      <td>-0.343706</td>
+      <td>-0.824015</td>
+      <td>-0.076909</td>
+      <td>-0.115275</td>
+      <td>0.065754</td>
+      <td>-0.484392</td>
+      <td>-0.473929</td>
+      <td>-0.005181</td>
+      <td>-0.032439</td>
+      <td>0.013960</td>
+      <td>0.020857</td>
       <td>-0.000094</td>
       <td>-0.003749</td>
       <td>0.006635</td>
@@ -429,6 +710,7 @@ X_train_std.head()
     </tr>
     <tr>
       <th>4</th>
+      <td>1.121905</td>
       <td>1</td>
       <td>-0.160970</td>
       <td>0</td>
@@ -439,7 +721,60 @@ X_train_std.head()
       <td>1</td>
       <td>1</td>
       <td>0</td>
-      <td>...</td>
+      <td>0</td>
+      <td>1</td>
+      <td>-0.823084</td>
+      <td>-1.521292</td>
+      <td>0.516578</td>
+      <td>0.056582</td>
+      <td>0.613315</td>
+      <td>1.113319</td>
+      <td>1.781157</td>
+      <td>0.338415</td>
+      <td>-0.602585</td>
+      <td>-0.189067</td>
+      <td>0.586715</td>
+      <td>0.476561</td>
+      <td>-0.099704</td>
+      <td>0.488832</td>
+      <td>-0.546632</td>
+      <td>0.189374</td>
+      <td>-0.118596</td>
+      <td>0.780831</td>
+      <td>-0.160039</td>
+      <td>0.662249</td>
+      <td>-0.449892</td>
+      <td>0.202553</td>
+      <td>-0.133156</td>
+      <td>0.119957</td>
+      <td>-0.809176</td>
+      <td>0.038450</td>
+      <td>-0.444998</td>
+      <td>-0.146690</td>
+      <td>-0.360775</td>
+      <td>-0.127391</td>
+      <td>0.806959</td>
+      <td>-0.571339</td>
+      <td>0.287627</td>
+      <td>-0.263162</td>
+      <td>0.709232</td>
+      <td>0.108071</td>
+      <td>-0.401908</td>
+      <td>0.043380</td>
+      <td>-0.273501</td>
+      <td>0.072295</td>
+      <td>0.506272</td>
+      <td>-0.367695</td>
+      <td>1.120385</td>
+      <td>-0.514067</td>
+      <td>-0.115275</td>
+      <td>0.347360</td>
+      <td>-0.484392</td>
+      <td>-0.455347</td>
+      <td>-0.005181</td>
+      <td>-0.032439</td>
+      <td>1.295160</td>
+      <td>0.219009</td>
       <td>-0.000094</td>
       <td>-0.003749</td>
       <td>0.006635</td>
@@ -453,7 +788,6 @@ X_train_std.head()
     </tr>
   </tbody>
 </table>
-<p>5 rows × 74 columns</p>
 </div>
 
 
@@ -483,14 +817,14 @@ print('QDA Test Score: ',qda.score(X_test_std,y_test))
 
     Training accuracy
     ------------------
-    LDA Train Score:  0.85346215781
-    QDA Train Score:  0.816425120773
+    LDA Train Score:  0.848631239936
+    QDA Train Score:  0.819645732689
     
     
     Test accuracy
     ------------------
-    LDA Test Score:  0.796296296296
-    QDA Test Score:  0.716049382716
+    LDA Test Score:  0.814814814815
+    QDA Test Score:  0.697530864198
 
 
 
@@ -517,18 +851,18 @@ print("QDA:\n",
 
     Confusion Matrix
     LDA:
-     [[26 16  0]
-     [ 9 79  5]
+     [[30 12  0]
+     [10 78  5]
      [ 1  2 24]]
     QDA:
-     [[29 13  0]
-     [12 66 15]
-     [ 0  6 21]]
+     [[23 18  1]
+     [ 6 70 17]
+     [ 0  7 20]]
 
 
 ## K-Nearest Neighbours
 
-The optimal number of neighbours is 37, which is a relatively large number considering that we only have 783 observations. The accuracy is not satisfactory as well.
+The optimal number of neighbours is 41, which is a relatively large number considering that we only have 783 observations. The accuracy is not satisfactory as well.
 
 
 
@@ -614,7 +948,7 @@ print('Decision Tree Test Accuracy: ', dt_best.score(X_test,y_test))
 
 
     Decision Tree Training Accuracy:  0.90499194847
-    Decision Tree Test Accuracy:  0.734567901235
+    Decision Tree Test Accuracy:  0.746913580247
 
 
 
@@ -629,7 +963,7 @@ print("Decision Tree Confusion Matrix:\n",
 
     Decision Tree Confusion Matrix:
      [[24 18  0]
-     [21 71  1]
+     [19 73  1]
      [ 0  3 24]]
 
 
@@ -641,7 +975,7 @@ We used `GridSearchCV` to find the optimal number of trees and tree depth. We th
 
 ```python
 trees = [2**x for x in range(8)]  # 1, 2, 4, 8, 16, 32, ...
-depth = [2, 4, 6, 8, 10]
+depth = [2, 4, 6, 8, 10, 12, 14, 16]
 parameters = {'n_estimators': trees,
               'max_depth': depth}
 rf = RandomForestClassifier(random_state=9001)
@@ -661,11 +995,11 @@ rf_score = score(rf, X_train, y_train, X_test, y_test)
 ```
 
 
-    Optimal number of trees 16, tree depth: 8
+    Optimal number of trees 32, tree depth: 12
     
     
-    Random Forest Training Accuracy:  0.972624798712
-    Random Forest Test Accuracy:  0.796296296296
+    Random Forest Training Accuracy:  0.998389694042
+    Random Forest Test Accuracy:  0.802469135802
 
 
 
@@ -680,8 +1014,8 @@ print("Random Forest Confusion Matrix:\n",
 
     Random Forest Confusion Matrix:
      [[20 22  0]
-     [ 4 87  2]
-     [ 0  5 22]]
+     [ 5 85  3]
+     [ 0  2 25]]
 
 
 ## AdaBoost
@@ -718,7 +1052,7 @@ ab_score = score(ab, X_train, y_train, X_test, y_test)
     
     
     AdaBoost Training Accuracy:  1.0
-    AdaBoost Test Accuracy:  0.777777777778
+    AdaBoost Test Accuracy:  0.740740740741
 
 
 
@@ -732,26 +1066,13 @@ print("AdaBoost Confusion Matrix:\n",
 
 
     AdaBoost Confusion Matrix:
-     [[22 20  0]
-     [ 7 80  6]
+     [[20 22  0]
+     [13 76  4]
      [ 0  3 24]]
 
 
 
 ## Performance Summary
-
-
-
-```python
-import matplotlib
-import matplotlib.pyplot as plt
-%matplotlib inline
-
-import seaborn as sns
-sns.set_style('white')
-sns.set_context('paper', font_scale=1.5)
-```
-
 
 
 
@@ -816,63 +1137,63 @@ score_df
       <td>0.904992</td>
       <td>0.423510</td>
       <td>0.566828</td>
-      <td>0.853462</td>
-      <td>0.827697</td>
-      <td>0.615137</td>
-      <td>0.843800</td>
-      <td>0.615137</td>
-      <td>0.816425</td>
-      <td>0.972625</td>
-      <td>0.615137</td>
-      <td>0.478261</td>
+      <td>0.848631</td>
+      <td>0.830918</td>
+      <td>0.610306</td>
+      <td>0.845411</td>
+      <td>0.610306</td>
+      <td>0.819646</td>
+      <td>0.998390</td>
+      <td>0.610306</td>
+      <td>0.471820</td>
     </tr>
     <tr>
       <th>Test accuracy</th>
-      <td>0.777778</td>
-      <td>0.734568</td>
+      <td>0.740741</td>
+      <td>0.746914</td>
       <td>0.444444</td>
       <td>0.574074</td>
+      <td>0.814815</td>
+      <td>0.827160</td>
+      <td>0.592593</td>
       <td>0.796296</td>
-      <td>0.783951</td>
-      <td>0.586420</td>
-      <td>0.753086</td>
-      <td>0.586420</td>
-      <td>0.716049</td>
-      <td>0.796296</td>
-      <td>0.586420</td>
-      <td>0.388889</td>
+      <td>0.592593</td>
+      <td>0.697531</td>
+      <td>0.802469</td>
+      <td>0.592593</td>
+      <td>0.407407</td>
     </tr>
     <tr>
       <th>Test accuracy CN</th>
-      <td>0.523810</td>
+      <td>0.476190</td>
       <td>0.571429</td>
       <td>0.333333</td>
       <td>0.000000</td>
-      <td>0.619048</td>
-      <td>0.571429</td>
+      <td>0.714286</td>
+      <td>0.642857</td>
       <td>0.000000</td>
       <td>0.666667</td>
       <td>0.000000</td>
-      <td>0.690476</td>
+      <td>0.547619</td>
       <td>0.476190</td>
       <td>0.000000</td>
-      <td>0.761905</td>
+      <td>0.785714</td>
     </tr>
     <tr>
       <th>Test accuracy CI</th>
-      <td>0.860215</td>
-      <td>0.763441</td>
+      <td>0.817204</td>
+      <td>0.784946</td>
       <td>0.516129</td>
       <td>0.989247</td>
-      <td>0.849462</td>
-      <td>0.860215</td>
+      <td>0.838710</td>
+      <td>0.903226</td>
+      <td>0.924731</td>
+      <td>0.838710</td>
+      <td>0.924731</td>
+      <td>0.752688</td>
       <td>0.913978</td>
-      <td>0.763441</td>
-      <td>0.913978</td>
-      <td>0.709677</td>
-      <td>0.935484</td>
-      <td>0.913978</td>
-      <td>0.139785</td>
+      <td>0.924731</td>
+      <td>0.150538</td>
     </tr>
     <tr>
       <th>Test accuracy AD</th>
@@ -885,10 +1206,10 @@ score_df
       <td>0.370370</td>
       <td>0.851852</td>
       <td>0.370370</td>
-      <td>0.777778</td>
-      <td>0.814815</td>
+      <td>0.740741</td>
+      <td>0.925926</td>
       <td>0.370370</td>
-      <td>0.666667</td>
+      <td>0.703704</td>
     </tr>
   </tbody>
 </table>
@@ -926,7 +1247,7 @@ plt.show()
 
 
 
-![png](Classification%20Models%20and%20Their%20Performance_files/Classification%20Models%20and%20Their%20Performance_42_0.png)
+![png](Classification%20Models%20and%20Their%20Performance_files/Classification%20Models%20and%20Their%20Performance_41_0.png)
 
 
 
@@ -947,19 +1268,19 @@ plt.show()
 
 
 
-![png](Classification%20Models%20and%20Their%20Performance_files/Classification%20Models%20and%20Their%20Performance_43_0.png)
+![png](Classification%20Models%20and%20Their%20Performance_files/Classification%20Models%20and%20Their%20Performance_42_0.png)
 
 
 For baseline models, people usually use the dummy classifier with "stratified" strategy or the "most frequent" strategy. The "stratified" method generates prediction according to the class distribution of the training set. The "most frequent" strategy always predicts the most frequent class. We adopted the `stratified` strategy implemented by `sklearn`'s `DummyClassifer` as the baseline model. As can be seen above, all other classification models we used outperformed the dummy classifier as expected.
 
-Based on the above summary, AdaBoost has a very high training accuracy 100%. Random forest classifier has the second highest training accuracy which is close to 1 (0.972625), and it also has the highest accuracy (0.796296) on the test set. LDA has the same test accuracy (0.796296) as random forest classifier, and logistic regression with l1 regularization is the third highest (0.783951).
+Based on the above summary, `AdaBoost` and `Random Forest` have perfect training accuracy, 100%. Three classifiers with the highest test accuracies are `Random Forest` (0.802469), `LDA` (0.814815) and `Logistic Regression with l1` (0.827160), among which `Logistic Regression with l1` has the best performance.
 
 For classifying `CN` patients, weighted logistic regression has the highest test accuracy (0.833333), so it performs the best for determining Cognitively Normal patients. However, KNN, logistic regression with l2 regularization, OvR logistic regression and unweighted logistic regression have zero accuracy on classifying `CN` patients. Since all of them have very high accuracy on `CI` but low accuracy on `AD`, we think these four models probably classify almost all the `CN` patients into `CI` (as can been seen in the confusion matrix), leading to zero accuracy on `CN` and high accuracy on `CI`.
 
 KNN has the highest test accuracy (0.989247) on diagnosing `CI` cognitive impairment patients. Logistic regression with l2 regularization, random forest classifier, OvR logistic regression and unweighted logistic regression all reach 0.9 accuracy on diagnosing `CI` patients.
 
-Since we focus on the diagnosis of Alzheimer's disease, we are more concerned about the test accuracy on `AD` patients. AdaBoost, LDA and decision tree classifier have the highest test accuracy(0.888889) on `AD` patients. Logistic regression with l1 regularization, random forest classifier and multinomial logistic regression all achieve test accuracy of over 0.8 on the classification of `AD`.
+Since we focus on the diagnosis of Alzheimer's disease, we are more concerned about the test accuracy on `AD` patients. Random forest classifier has the highest test accuracy (0.925926) on `AD` patients. Adaboost, LDA, decision tree, and multinomial logistic regression all achieve test accuracy reaching 0.90 on the classification of `AD`.
 
-In addition, we find an interesting pattern in the above barplots of accuracy. There seems to be three types of classifiers. Type I includes `Weighted Logistic` and `Dummy Classifier`. Their overall accuracies are at a relatively low level around 0.40. Type II includes `KNN`, `Logistic Regression with l2`, `OvR` and `Unweighted Logistic`. Their overall accuracies are at a midium level around 0.60, and their partial accuracies on the three classes are very unbalanced. None of them can predict correctly on `CN`. Type III includes `QDA`, `Decision Tree`, `Multinomial`, `AdaBoost`, `Logistic Regression with l1`, `LDA` and `Random Forest`. Their overall accuracies are at a relatively high level over 0.70, and their partial accuracies on the three classes are basically balanced. Among Type III classifiers, though `QDA` has the lowest overall accuracy, its partial accuracies are the most balanced. Every Type III classifier has its own advantage and can be competitive substitution to each other.
+In addition, we find an interesting pattern in the above barplots of accuracy. There seems to be three types of classifiers. Type I includes `Weighted Logistic` and `Dummy Classifier`. Their overall accuracies are at a relatively low level around 0.40. Type II includes `KNN`, `Logistic Regression with l2`, `OvR` and `Unweighted Logistic`. Their overall accuracies are at a midium level around 0.60, and their partial accuracies on the three classes are very unbalanced. None of them can predict correctly on `CN`. Type III includes `QDA`, `AdaBoost`, `Decision Tree`, `Multinomial`, `Random Forest`, `LDA` and `Logistic Regression with l1`. Their overall accuracies are at a relatively high level over 0.70, and their partial accuracies on the three classes are basically balanced. Every Type III classifier has its own advantage and can be competitive substitution to each other.
 
-To conclude, `Random Forest` and `LDA` performed the best if we are concerned about both overall test accuracy and correctly diagnosing `AD` patients. Other models such as `QDA`, `Decision Tree`, `Multinomial`, `AdaBoost` and `Logistic Regression with l1` are also promising.
+To conclude, `Logistic Regression with l1`, `LDA` and `Random Forest` perform the best if we are concerned about both overall test accuracy and correctly diagnosing `AD` patients. Other models such as `QDA`, `AdaBoost`, `Decision Tree` and `Multinomial` are also promising.
