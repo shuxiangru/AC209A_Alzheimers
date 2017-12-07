@@ -21,13 +21,38 @@ Random forest classifier, linear discriminant analysis and logistic regression w
 
 Our main focus is to achieve high classification accuracy on the Alzheimer's disease. Random forest classifier has the highest test accuracy on Alzheimer's disease patients. Adaboost, LDA, decision tree, logistic regression with l1 regularization and multinomial logistic regression all achieve test accuracy of over 0.85 on the classification of `AD`. However, at the same time, we do not want to incorrectly classify too many patients from the other two classes. We divided all models into three groups according to test accuracies. The overall performance suggests that Type III models such as random forest classifier and LDA are the most suitable models in the classification of the Alzheimer's disease. 
 
-After performing boostrapping and forward/backward variable selections, we ended up with a set of the most significant predictors. According to those predictors, the tests completed excluded are `FDG`(fluorodeoxyglucose) PET imaging test, and `MOCA`(Montreal Cognitive Assessment). The results of these tests are not significant in the diagnosis, possibly because other assessments are testing similar aspects of the patients.
+After performing boostrapping and forward/backward variable selections, we ended up with a set of the most significant predictors. According to those predictors, the tests completed excluded is `MOCA`(Montreal Cognitive Assessment). The result of this test is not significant in the diagnosis, possibly because other assessments are testing similar aspects of the patients.
 
 The factors that are significant themselves but insignificant in their slopes are `MMSE`, `EcogSPMem`, `ADAS13`, `EcogPtMem`, `CSF_TAU`, `FAQ`, `EcogPtLang`, and `EcogSPPlan`. This result indicates that tests associated with these factors only need to be conducted once at the baseline visit and are not necessary in the following visits. Specifically, Mini-Mental State Examination (`MMSE`), Everyday Cognition test on Participant Memory and Language, Study Partner Memory and Plan (`EcogSPMem`, `EcogPtMem`, `EcogPtLang`, `EcogSPPlan`), Functional Activities Questionnaire in Older Adults with Dementia (`FAQ`), Alzheimer’s Disease Assessment Scale (`ADAS13`) and biosample test (`CSF_TAU`) only need to be checked at the first visit.
 
 The factors that are significant in their slopes are `AV45_slope`, `EcogSPLang_slope`, `WholeBrain_slope`, `MidTemp_slope`, `Fusiform_slope`, `FDG_slope`, `RAVLT_perc_forgetting_slope` and `ICV_slope`. That shows that the change in these parameters within two years after the first visit is quite important for the diagnosis. So testing these parameters on each subsequent visit is necessary. Specifically, The tests that need to be conducted in every visit are Ecog (Everyday Cognition) test on study partner language, AV45 test, FDG imaging test, RAVLT_learning test and MRI test.
 
 Other significant demographic factors are age, marital status, race and ethnicities. Remarkably, `MMSE` appears in the output of all variable selection methods. So we can conclude that it's an essetial test in the diagnosis of AD.
+
+### Conclusion Tables
+#### Advice on Tests
+| Advice                                | Tests                                                                                  |
+|---------------------------------------|----------------------------------------------------------------------------------------|
+| Tests not needed                      | MOCA                                                                                   |
+| Tests only needed for the first visit | MMSE, ADAS13, FAQ, CSF(TAU),  EcogPtMem, EcogPtLang,  EcogSPPlan, EcogSPMem            |
+| Test needed for each following visit  | AV45, RAVLT(perc_forgetting),  FDG, EcogSPLang MRI(WholeBrain, MidTemp, Fusiform, ICV) |
+| Tests selected by all models          | MMSE                                                             
+
+#### Predictor Dictionary
+
+| Predictor name | Test subject details                        |
+|----------------|---------------------------------------------|
+| CSF            | Cerebrospinal fluid                         |
+| FDG            | Fluorodeoxyglucose PET                      |
+| AV45           | Florbetapir  PET                            |
+| ADAS13         | Alzheimer’s Disease Assessment Scale        |
+| MMSE           | Mini-Mental State Examination               |
+| RAVLT          | Rey Auditory Verbal Learning Immediate Test |
+| MOCA           | Montreal Cognitive Assessment               |
+| EcogPt         | Everyday Cognition Test on participant      |
+| EcogSP         | Everyday Cognition Test on study partner    |
+| FAQ            | Functional Activities Questionnaire         |
+| MRI            | Magnetic Resonance Imaging                  |
 
 To further improve the classification accuracy of Alzheimer's disease, we tested the neural networks model. The overall test accuracy of neural networks is better than that of the random forest classifier. It also has a significantly higher accuracy on cognitively normal people although its accuracies on cognitive impairment and Alzheimer's disease are slightly lower. We would say that the neural networks model belongs to the group of Type III classifiers. It is also a very promising model.
 
