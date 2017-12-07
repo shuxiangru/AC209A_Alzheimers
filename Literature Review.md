@@ -5,13 +5,6 @@ nav_include: 4
 
 ## Literature Review
 
----
-title: Literature Review
-nav_include: 3
----
-
-## Literature Review
-
 To accurately diagnose Alzheimer's Disease(AD) and determine the most significant tests, we need to first investigate possible predictors for the diagnosis. It's commonly believed that there are four types of factors/test results that are helpful in diagnosing AD: demographic factors, brain imaging results, cognition test results, and biomarker effects. Young et al. [1] demonstrated the changes of biomarker as Alzheimer's disease progresses, which supported our feature engineering decision of adding a slope variable for all continuous predictors. We learned from the paper that the value of cerebrospinal fluid biomarkers, such as amyloid-beta, phosphorylated tau and total tau, would become abnormal if a person had Alzheimer's disease. This motivated us to merge our ADNIMERGE data set with the UPenn CSF biomarkers data set. Young pointed out that the rates of atrophy, cogitive test scores, and regional brain volume would vary greatly between AD patients and cognitively normal people. In addition, Moradi et al. [2] stated that high values of the Rey's Auditory Verbal Learning Test Scores were associated with the Alzheimer's disease. 
 
 Notably, many of the assessments are essentially testing similar aspects of the patients. For example, both the Rey Auditory Verbal Learning Test (RAVLT) and the Alzheimer’s Disease Assessment Scale (ADAS) includes tests for rate of learning and short-term memory [3,4,5]. So it would be helpful if we can reduce the number of tests in the process of disagnosis. Furthermore, if the results of certain tests along several visits are not significantly different or indicative for the diagnosis, we would also like to eliminate them.
