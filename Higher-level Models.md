@@ -20,14 +20,15 @@ import pandas as pd
 import numpy as np
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import KFold
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import confusion_matrix
 ```
 
 
 
 
 ```python
-# load data
 df_train = pd.read_csv("data/ADNIMERGE_train.csv")
 df_test = pd.read_csv("data/ADNIMERGE_test.csv")
 X_train = df_train.drop(['RID', 'DX_bl'], axis=1).copy()
@@ -40,7 +41,6 @@ y_test = df_test['DX_bl'].copy()
 
 
 ```python
-# function to help compare the accuracy of models
 def score(model, X_train, y_train, X_test, y_test):
     train_acc = model.score(X_train,y_train)
     test_acc = model.score(X_test,y_test)
@@ -257,49 +257,85 @@ X_train_std.head()
 
 
 ```python
-# find the best parameters
+cv_fold = KFold(n_splits=4, shuffle=True, random_state=9001)
 parameters = {'alpha': [1e-3, 1e-2, 1e-1, 1, 1e1, 1e2],
-              'hidden_layer_sizes': [(50,), (100,), (300,), 
-                                     (50, 10), (50, 25), (50, 50), 
-                                     (100, 10), (100, 25), (100, 50)]}
-mlp = MLPClassifier(solver = 'lbfgs', activation='logistic', random_state=9001)
-mlp_cv = GridSearchCV(mlp, parameters)
+              'hidden_layer_sizes': [(10), (25), (50), (100),
+                                     (10, 10), (10, 25), (10, 50), 
+                                     (25, 10), (25, 25), 
+                                     (50, 10)]}
+mlp = MLPClassifier(solver='lbfgs', activation='logistic', random_state=9001)
+mlp_cv = GridSearchCV(mlp, parameters, cv=cv_fold)
 mlp_cv.fit(X_train_std, y_train)
 best_score = np.argmax(mlp_cv.cv_results_['mean_test_score'])
 result = mlp_cv.cv_results_['params'][best_score]
 a = result['alpha']
 hidden_layer = result['hidden_layer_sizes']
-mlp = MLPClassifier(solver = 'lbfgs', activation='logistic', random_state=9001,
+mlp = MLPClassifier(solver='lbfgs', activation='logistic', random_state=9001,
                     alpha = a, hidden_layer_sizes=hidden_layer)
-mlp.fit(X_train_std, y_train)
+mlp = mlp.fit(X_train_std, y_train)
+```
+
+
+
+
+```python
 print("Optimal parameters")
 print("L2 penalty parameter: ", a)
-print("Hidde Layer Sizes: ", hidden_layer)
+print("Hidden Layer Sizes: ", hidden_layer)
 print('\n-----------------\n')
 print("Training accuracy: ", mlp.score(X_train_std, y_train))
 print("Test accuracy: ", mlp.score(X_test_std, y_test))
+print('\n-----------------\n')
+print('Test Confusion Matrix: ')
+print(confusion_matrix(y_test, mlp.predict(X_test_std)))
 nn_score = score(mlp, X_train_std, y_train, X_test_std, y_test)
 ```
 
 
     Optimal parameters
     L2 penalty parameter:  10.0
-    Hidde Layer Sizes:  (50,)
+    Hidden Layer Sizes:  25
     
     -----------------
     
-    Training accuracy:  0.826086956522
-    Test accuracy:  0.783950617284
+    Training accuracy:  0.824476650564
+    Test accuracy:  0.777777777778
+    
+    -----------------
+    
+    Test Confusion Matrix: 
+    [[24 18  0]
+     [ 8 79  6]
+     [ 0  4 23]]
 
 
 
 
 ```python
-# random forest to compare with
-rf_best = RandomForestClassifier(n_estimators=32, max_depth=10, random_state=9001)
+rf_best = RandomForestClassifier(n_estimators=16, max_depth=8, random_state=9001)
 rf_best.fit(X_train, y_train)
 rf_score = score(rf_best, X_train, y_train, X_test, y_test)
+print('\n-----------------\n')
+print("Training accuracy: ", rf_best.score(X_train, y_train))
+print("Test accuracy: ", rf_best.score(X_test, y_test))
+print('\n-----------------\n')
+print('Test Confusion Matrix: ')
+print(confusion_matrix(y_test, rf_best.predict(X_test)))
 ```
+
+
+    
+    -----------------
+    
+    Training accuracy:  0.972624798712
+    Test accuracy:  0.796296296296
+    
+    -----------------
+    
+    Test Confusion Matrix: 
+    [[20 22  0]
+     [ 4 87  2]
+     [ 0  5 22]]
 
 
 
@@ -339,27 +375,27 @@ score_df
   <tbody>
     <tr>
       <th>Train accuracy</th>
-      <td>0.826087</td>
-      <td>0.851852</td>
+      <td>0.824477</td>
+      <td>0.972625</td>
     </tr>
     <tr>
       <th>Test accuracy</th>
-      <td>0.783951</td>
-      <td>0.771605</td>
+      <td>0.777778</td>
+      <td>0.796296</td>
     </tr>
     <tr>
       <th>Test accuracy CN</th>
       <td>0.571429</td>
-      <td>0.404762</td>
+      <td>0.476190</td>
     </tr>
     <tr>
       <th>Test accuracy CI</th>
       <td>0.849462</td>
-      <td>0.924731</td>
+      <td>0.935484</td>
     </tr>
     <tr>
       <th>Test accuracy AD</th>
-      <td>0.888889</td>
+      <td>0.851852</td>
       <td>0.814815</td>
     </tr>
   </tbody>
@@ -368,8 +404,8 @@ score_df
 
 
 
-The optimal hidden layer size is one hidden layer with 50 neurons. We need a l2-regularization term with value 10 to achieve the best accuracy.
+The optimal hidden layer size is one hidden layer with 25 neurons. We need a l2-regularization term with value 10 to achieve the best accuracy.
 
-The overall test accuracy of Neural Network is the same as that of the best baseline model, random forest, in the previous model comparison section. However, we found that the test accuracy for the cognitive normal group and the Alzheimer's disease group is much higher using neural network. These two groups are what we are interested in.
+The overall test accuracy of neural networks is close to that of the best random forest in the previous model comparison section. However, we found that the test accuracy for the cognitively normal group and the Alzheimer's disease group is considerably higher using neural network. These two groups are what we want to differentiate.
 
-We would prefer neural network model to the random forest because of its high classification accuracy of Alzheimer's disease.
+Hence, we would prefer neural networks model to the random forest classifier.
