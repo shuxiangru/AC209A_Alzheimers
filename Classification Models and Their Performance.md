@@ -81,7 +81,7 @@ def score(model, X_train, y_train, X_test, y_test):
 
 ## Baseline Model
 
-We used `stratified` strategy to generate predictions as a simple baseline to compare with other classifiers we learned in class.
+We used `stratified` strategy as a simple baseline model to generate predictions to be compared with other classifiers we learned in class.
 
 
 
@@ -1217,6 +1217,8 @@ score_df
 
 
 
+To better visualize the accuracies of each classification models, we first ordered the models by their test accuracies and compared both training and test accuracies in the bar plot.
+
 
 
 ```python
@@ -1247,8 +1249,10 @@ plt.show()
 
 
 
-![png](Classification%20Models%20and%20Their%20Performance_files/Classification%20Models%20and%20Their%20Performance_41_0.png)
+![png](Classification%20Models%20and%20Their%20Performance_files/Classification%20Models%20and%20Their%20Performance_42_0.png)
 
+
+The we compare their test accuracies on three classes `CN`, `CI` and `AD` respectively.
 
 
 
@@ -1268,18 +1272,18 @@ plt.show()
 
 
 
-![png](Classification%20Models%20and%20Their%20Performance_files/Classification%20Models%20and%20Their%20Performance_42_0.png)
+![png](Classification%20Models%20and%20Their%20Performance_files/Classification%20Models%20and%20Their%20Performance_44_0.png)
 
 
-For baseline models, people usually use the dummy classifier with "stratified" strategy or the "most frequent" strategy. The "stratified" method generates prediction according to the class distribution of the training set. The "most frequent" strategy always predicts the most frequent class. We adopted the `stratified` strategy implemented by `sklearn`'s `DummyClassifer` as the baseline model. As can be seen above, all other classification models we used outperformed the dummy classifier as expected.
+For baseline models, people usually use the dummy classifier with the "stratified" strategy or the "most frequent" strategy. The "stratified" method generates prediction according to the class distribution of the training set. The "most frequent" strategy always predicts the most frequent class. We adopted the `stratified` strategy implemented by `sklearn`'s `DummyClassifer` as a baseline model. As can be seen above, almost all other classification models we used outperformed the dummy classifier as expected.
 
-Based on the above summary, `AdaBoost` and `Random Forest` have perfect training accuracy, 100%. Three classifiers with the highest test accuracies are `Random Forest` (0.802469), `LDA` (0.814815) and `Logistic Regression with l1` (0.827160), among which `Logistic Regression with l1` has the best performance.
+Based on the above summary, `AdaBoost` and `Random Forest` have almost perfect training accuracy. Three classifiers with the highest test accuracies are `Random Forest` (0.802469), `LDA` (0.814815) and `Logistic Regression with l1` (0.827160), among which `Logistic Regression with l1` has the best performance.
 
-For classifying `CN` patients, weighted logistic regression has the highest test accuracy (0.833333), so it performs the best for determining Cognitively Normal patients. However, KNN, logistic regression with l2 regularization, OvR logistic regression and unweighted logistic regression have zero accuracy on classifying `CN` patients. Since all of them have very high accuracy on `CI` but low accuracy on `AD`, we think these four models probably classify almost all the `CN` patients into `CI` (as can been seen in the confusion matrix), leading to zero accuracy on `CN` and high accuracy on `CI`.
+For classifying `CN` patients, weighted logistic regression has the highest test accuracy (0.785714), so it performs the best for determining Cognitively Normal patients. However, KNN, logistic regression with l2 regularization, OvR logistic regression and unweighted logistic regression have zero accuracy on classifying `CN` patients. Since all of them have very high accuracy on `CI` but low accuracy on `AD`, we think these four models probably classify almost all the `CN` patients into `CI` (as can been seen in the confusion matrices), leading to zero accuracy on `CN` and high accuracy on `CI`.
 
-KNN has the highest test accuracy (0.989247) on diagnosing `CI` cognitive impairment patients. Logistic regression with l2 regularization, random forest classifier, OvR logistic regression and unweighted logistic regression all reach 0.9 accuracy on diagnosing `CI` patients.
+KNN has the highest test accuracy (0.989247) on diagnosing `CI` cognitive impairment patients. Logistic regression with l1 regularization, logistic regression with l2 regularization, random forest classifier, OvR logistic regression and unweighted logistic regression all reach 0.9 accuracy on diagnosing `CI` patients.
 
-Since we focus on the diagnosis of Alzheimer's disease, we are more concerned about the test accuracy on `AD` patients. Random forest classifier has the highest test accuracy (0.925926) on `AD` patients. Adaboost, LDA, decision tree, and multinomial logistic regression all achieve test accuracy reaching 0.90 on the classification of `AD`.
+Since we focus on the diagnosis of Alzheimer's disease, we are more concerned about the test accuracy on `AD` patients. Random forest classifier has the highest test accuracy (0.925926) on `AD` patients. Adaboost, LDA, decision tree, logistic regression with l1 regularization and multinomial logistic regression all achieve test accuracy of over 0.85 on the classification of `AD`.
 
 In addition, we find an interesting pattern in the above barplots of accuracy. There seems to be three types of classifiers. Type I includes `Weighted Logistic` and `Dummy Classifier`. Their overall accuracies are at a relatively low level around 0.40. Type II includes `KNN`, `Logistic Regression with l2`, `OvR` and `Unweighted Logistic`. Their overall accuracies are at a midium level around 0.60, and their partial accuracies on the three classes are very unbalanced. None of them can predict correctly on `CN`. Type III includes `QDA`, `AdaBoost`, `Decision Tree`, `Multinomial`, `Random Forest`, `LDA` and `Logistic Regression with l1`. Their overall accuracies are at a relatively high level over 0.70, and their partial accuracies on the three classes are basically balanced. Every Type III classifier has its own advantage and can be competitive substitution to each other.
 

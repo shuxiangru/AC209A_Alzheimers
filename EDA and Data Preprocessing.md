@@ -659,12 +659,12 @@ print('other patients:', num_other)
 
 ## Histogram
 
-We plotted histograms for each predictor to look at the distribution of each category. To better classify Alzheimer's Disease, we would like to know the relationship of each variable and the diagnosis. In addition, we would like to know how much data is missing in each category of diagnosis and find the best imputing method based on the result.
+We plotted histograms for each predictor to look at the distribution of each category. To better classify Alzheimer's Disease and find predictors that are significant, we would like to know the relationship between each variable and the diagnosis. In addition, we would like to know how much data is missing in each category of diagnosis and find the best imputing method based on the result.
 
 Here are some noteworthy findings:
-- `CDRSB`: All the cognitively normal `CN` patients have a value close to 0. As the value increases, it is more likely that the patient has Alzheimer’s disease. Cognitive impairment and Alzheimer’s Disease `AD` patients can have different values for these two variables. That shows if the value is not 0, then the patient is experiencing some sort of dementia. This could be a very strong predictor. However, `CDRSB` is actively used to deduce DX and will erroneously inflate accuracy. We decided to delete this variable along with its slope.
-- `ADAS13`, `CSF_TAU` and `EcogSPMem`: From the plot, it seems that as the value increases, the likelihood of `AD` also increases. It indicates high values are associated with Alzheimer’s Disease. Three categories are well separated.
-- `RAVLT_immediate` and `Hippocampus` have negative relationship with Alzheimer’s. As the value of these variables decreases, it is more likely to get AD.
+- `CDRSB`: All the cognitively normal `CN` patients have a value close to 0. As the value increases, it is more likely that the patient has Alzheimer’s disease. Cognitive impairment and Alzheimer’s Disease `AD` patients can have different values for these two variables. That shows if the value is not 0, then the patient is experiencing some sort of dementia. This may be a very strong predictor. However, `CDRSB` is actively used to deduce the diagnosis `DX_bl` and will erroneously inflate accuracy. We decided to delete this variable along with its slope.
+- `ADAS13`, `CSF_TAU` and `EcogSPMem`: From the plot, it seems that as the value increases, the likelihood of `AD` also increases. It indicates high values are associated with Alzheimer’s Disease. Three categories of the diagnosis are well separated.
+- `RAVLT_immediate` and `Hippocampus` are negatively correlated with Alzheimer’s. As the values of these variables decrease, it is more likely to get AD.
 - The missing rate is very low overall. For the predictors that have missing values, the precentage of missing value is similar across each category.
 
 Note: The percentage value in the legend indicates the percentage of data that is not missing in each category
@@ -740,7 +740,7 @@ To avoid collinearity, we would like to examine the correlation between variable
 
 According to the heap map of all selected predictors, there are high correlations between the following
 pairs of predictors: `CDRSB` vs `FAQ`, `ADAS11` vs `ADAS13`, `WholeBrain` vs `ICV`, and among all
-`EcogXXX` predictors. To deal with these correlations, we deleted `ADAS11`, `EcogPtTotal` and `EcogSPTotal` based on the review of scientific papers that investigate the importance of the factors mentioned above related to the prediction of Alzheimer’s Disease. 
+`EcogXXX` predictors. To deal with these correlations, we deleted `ADAS11`, `EcogPtTotal` and `EcogSPTotal` based on the review of scientific papers that investigated the importance of the factors mentioned above related to the prediction of Alzheimer’s Disease. 
 
 Note: The heatmap is obtained by only considering the value that are not None in both predictors.
 
@@ -794,7 +794,7 @@ fig.colorbar(plot)
 ![png](EDA%20and%20Data%20Preprocessing_files/EDA%20and%20Data%20Preprocessing_11_1.png)
 
 
-We listed the predictors that have a small slope in magnitude related to its value. We deleted these slope variables, `APOE4_slope`, `CSF_ABETA_slope`, `CSF_TAU_slope`, and `CSF_PTAU_slope` as they could not show any trend of the following visits of the patients and were meaningless. We also checked the collinearity of the slopes themselves. We ended up with the same conclusion as above. To deal with these correlations, we deleted `ADAS11_slope`, `EcogPtTotal_slope` and `EcogSPTotal_slope`. Further, we found that the slopes are not collinear with the predictors. 
+We listed below the predictors that have a small slope in magnitude related to its value. We deleted these slope variables, `APOE4_slope`, `CSF_ABETA_slope`, `CSF_TAU_slope`, and `CSF_PTAU_slope` as they could not show any trend of the following visits of the patients and were meaningless. We also checked the collinearity of the slopes themselves. We ended up with the same conclusion as above. To deal with these correlations, we deleted `ADAS11_slope`, `EcogPtTotal_slope` and `EcogSPTotal_slope`. Further, we found that the slopes are not collinear with the predictors. 
 
 
 
@@ -861,6 +861,8 @@ fig.colorbar(plot)
 
 
 ## Drop Predictors
+
+We dropped the predictors mentioned above.
 
 
 

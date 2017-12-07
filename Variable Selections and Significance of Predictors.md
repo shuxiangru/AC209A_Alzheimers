@@ -46,7 +46,7 @@ We would like to find out the most significant variables in the model. These var
 
 For logistic regression with l1 regularization, we used bootstraping (200 iterations) to find the most significant predictors. For random forest, we chcked the returned attribute `feature_importances_`.
 
-## Bootstrap
+## Bootstrapping
 
 
 
@@ -83,13 +83,13 @@ print(X_train.columns[sig_b_ct])
     Index(['ADAS13', 'MMSE', 'RAVLT_immediate', 'FAQ', 'ICV_slope'], dtype='object')
 
 
-Surprisingly, we only have 5 significant predictors using bootstrap method and four of them are cognitive assessments which don't cost as much as brain imaing tests. Specifically, the significant assessments are: 
+Surprisingly, we only have 5 significant predictors using bootstrapping and four of them are cognitive assessments which don't cost as much as brain imaing tests. Specifically, the significant assessments are: 
 - **`ADAS13`**: Alzheimer’s Disease Assessment Scale
 - **`MMSE`**: Mini-Mental State Examination
 - **`RAVLT_immediate`**: Rey Auditory Verbal Learning Immediate Test
-- **`FAQ`**: Functional Activities Questionnaire in Older Adults with Dementia. 
-We found this result a bit doubtful because no brain imaging tests are picked as significant predictors while studies have shown the great important role of brain imaging in diagnosing Alzheimer's Disease. However, if other models also give similar result, patients are likely to save a lot of money and time. 
-- **`ICV_slope`**: The change of intracranial vault volume in magnetic resonance imaging(MRI) result
+- **`FAQ`**: Functional Activities Questionnaire in Older Adults with Dementia
+We found this result a bit doubtful because no brain imaging tests are picked as significant predictors while studies have shown the important role of brain imaging in diagnosing Alzheimer's Disease. However, if other models also give similar results, patients are likely to save a lot of money and time. 
+- **`ICV_slope`**: The change of intracranial vault volume in magnetic resonance imaging (MRI) result
 
 ## Feature importance by Random Forest
 
@@ -177,10 +177,11 @@ print(ranked_x_rf)
     ['MMSE', 'EcogSPMem', 'ADAS13', 'EcogPtMem', 'FAQ', 'EcogPtLang', 'MOCA', 'RAVLT_perc_forgetting', 'EcogSPDivatt', 'MMSE_slope', 'CSF_TAU', 'RAVLT_immediate', 'FAQ_slope', 'PTAGE', 'AV45', 'FDG', 'Entorhinal', 'EcogSPLang_slope', 'EcogSPLang', 'EcogSPOrgan', 'Ventricles_slope', 'MOCA_slope', 'FDG_slope', 'Hippocampus', 'EcogSPVisspat_slope', 'EcogSPPlan', 'EcogSPMem_slope', 'CSF_ABETA', 'WholeBrain', 'ADAS13_slope', 'Ventricles', 'EcogSPPlan_slope', 'ICV', 'Fusiform', 'Fusiform_slope', 'WholeBrain_slope', 'EcogPtDivatt_slope', 'RAVLT_learning_slope', 'EcogSPDivatt_slope', 'MidTemp_slope', 'RAVLT_immediate_slope', 'Hippocampus_slope', 'EcogPtDivatt', 'EcogPtVisspat_slope', 'EcogPtLang_slope', 'EcogPtMem_slope', 'RAVLT_forgetting_slope', 'RAVLT_perc_forgetting_slope', 'EcogSPOrgan_slope', 'Entorhinal_slope', 'EcogSPVisspat', 'AV45_slope', 'ICV_slope', 'EcogPtOrgan_slope', 'MidTemp', 'RAVLT_learning', 'EcogPtPlan_slope', 'CSF_PTAU', 'EcogPtVisspat', 'EcogPtOrgan', 'PTEDUCAT', 'RAVLT_forgetting', 'EcogPtPlan', 'PTMARRY_Married', 'PTGENDER', 'APOE4', 'PTRACCAT_Asian', 'PTRACCAT_White', 'PTRACCAT_More_than_one', 'PTMARRY_Widowed', 'PTRACCAT_Black', 'PTMARRY_Never_married', 'PTETHCAT_Not_Hisp/Latino', None, 'PTRACCAT_Unknown']
 
 
-Using random forest classifier, we ended up with 73 important features. 
-Only `PTRACCAT_Hawaiian/Other_PI`, `PTRACCAT_Unknown` are not significant, all of which are indicators of race and marriage. Notably, among the top ranking 15 ranked predictors, `MMSE`, `FAQ`, `ADAS13`, and `RAVLT_immediate` appear again (also appeared in bootstraping result), which add even more significance to these cognitive tests. Additionally, many `Every Cognition Test` (ECogxxx) results are also shown to be significant here. We will see how they perfrom in the following selections.
+Using random forest classifier, we ended up with 73 important features. Only `PTRACCAT_Hawaiian/Other_PI` and `PTRACCAT_Unknown` are not significant, both of which are indicators of race. 
 
-## Forward and Backward Selection
+Notably, among the top 15 ranked predictors, `MMSE`, `FAQ`, `ADAS13`, and `RAVLT_immediate` appear again (also appeared in bootstrapping result), which add even more significance to these cognitive tests. Additionally, many `Every Cognition Test` (ECogxxx) results are also shown to be significant here. We will see how they perfrom in the following selections.
+
+## Forward and Backward Selections
 
 
 
@@ -281,6 +282,8 @@ predictors_backward,ranks_b = step_forwards_backwards(direction='backward')
 
 ### Significance ranking of predictors by stepwise selections
 
+We calculated the significance rankings of predictors to compare the rankings produced by different selection methods.
+
 
 
 ```python
@@ -335,7 +338,9 @@ print(ranked_x_backward)
     ['MMSE', 'EcogSPPlan', 'EcogPtLang', 'FDG_slope', 'MidTemp_slope', 'RAVLT_perc_forgetting_slope', 'PTMARRY_Married', 'PTGENDER', 'EcogSPLang_slope', 'PTAGE', 'ICV_slope', 'PTRACCAT_Hawaiian/Other_PI', 'ICV', 'CSF_TAU', 'EcogPtVisspat_slope', 'EcogSPDivatt_slope', 'Entorhinal_slope', 'EcogSPDivatt', 'Fusiform', 'APOE4', 'EcogSPMem_slope', 'EcogPtDivatt', 'PTRACCAT_White', 'Fusiform_slope', 'MMSE_slope', 'RAVLT_perc_forgetting', 'EcogPtOrgan_slope', 'MOCA', 'EcogPtMem_slope', 'RAVLT_learning', 'CSF_ABETA', 'EcogPtVisspat', 'FDG', 'Hippocampus', 'RAVLT_learning_slope', 'EcogPtOrgan', 'AV45', 'RAVLT_immediate_slope', 'WholeBrain_slope', 'PTRACCAT_Asian', 'WholeBrain', 'EcogPtLang_slope', 'Ventricles', 'PTEDUCAT', 'EcogSPLang', 'FAQ_slope', 'MOCA_slope', 'AV45_slope', 'EcogSPOrgan_slope', 'EcogPtPlan_slope', 'RAVLT_forgetting', 'EcogSPPlan_slope', 'RAVLT_forgetting_slope', 'CSF_PTAU', 'RAVLT_immediate', 'EcogPtDivatt_slope', 'MidTemp', 'EcogPtMem', 'Entorhinal', 'EcogPtPlan', 'FAQ', 'EcogSPVisspat', 'ADAS13_slope', 'PTRACCAT_Black', 'PTMARRY_Widowed', 'PTETHCAT_Not_Hisp/Latino', 'EcogSPMem', 'Hippocampus_slope', 'PTRACCAT_More_than_one', 'Ventricles_slope', 'PTRACCAT_Unknown', 'PTMARRY_Never_married', 'ADAS13', 'EcogSPVisspat_slope', 'EcogSPOrgan']
 
 
-### Combined significant predictors selected by RF, Forward and Backward selection
+### Combined significant predictors selected by random forest classifier, forward and backward selections
+
+We combined all significant predictors selected by random forest classifier, forward and backward selections. There are 24 predictors in total. We will further explain the pattern of these predictors in the last part of this section.
 
 
 
@@ -381,12 +386,12 @@ plt.show()
 
 
 
-![png](Variable%20Selections%20and%20Significance%20of%20Predictors_files/Variable%20Selections%20and%20Significance%20of%20Predictors_26_0.png)
+![png](Variable%20Selections%20and%20Significance%20of%20Predictors_files/Variable%20Selections%20and%20Significance%20of%20Predictors_28_0.png)
 
 
-There seems to be no pattern when we compare the rank of importance of different predictors selected by different methods.
+There seems to be no pattern when we compare the importance of predictors ranked by different methods.
 
-## Model Testing on the selected variables
+## Model Testing on the Selected Variables
 
 
 
@@ -487,15 +492,15 @@ rf_score
 
 
 
-Since the test results of the selected variables from only bootstraping does not perform as well as the random forest classifier with common selected variables, we choose to rely on the significant predictors selected by the random forest classifier. Let's interpret the selected predictors:
+Since the test result of variables selected from only bootstrapping does not perform as well as that of the combined significant variables, we choose to rely on the significant predictors selected by the union of the forward and backward selections. Let's interpret the selected predictors:
 
-- The tests completed excluded are: `FDG`, and `MOCA`, which means the results of those tests are not significant in the diagnosis, possibly because other assessments are testing similar aspects of the patients.
+- The tests completely excluded are: `FDG`, and `MOCA`, indicating the results of those tests are not significant in the diagnosis, possibly because other assessments are testing similar aspects of the patients.
 
-- The factors that are significant themselves but insignificant in their slopes are:`MMSE`, `EcogSPMem`, `ADAS13`,`EcogPtMem`,`CSF_TAU`,`FAQ`,`EcogPtLang`, and `EcogSPPlan`, which indicates that tests associated with these factors only need to be conducted once at baseline visit and are not necessary in the following visits. Specifically, Mini-Mental State Examination(`MMSE`), Everyday Cognition test on Participant Memory and Language, Study Partner Memory and Plan(`EcogSPMem`, `EcogPtMem`,`EcogPtLang`,`EcogSPPlan`), Functional Activities Questionnaire in Older Adults with Dementia(`FAQ`), Alzheimer’s Disease Assessment Scale(`ADAS13`) and biosample test(`CSF_TAU`) only need to be checked at the first visit.
+- The factors that are significant themselves but insignificant in their slopes are: `MMSE`, `EcogSPMem`, `ADAS13`, `EcogPtMem`, `CSF_TAU`, `FAQ`, `EcogPtLang`, and `EcogSPPlan`, so tests associated with these factors only need to be done once at the baseline visit and are not necessary in the following visits. Specifically, Mini-Mental State Examination(`MMSE`), Everyday Cognition test on Participant Memory and Language, Study Partner Memory and Plan(`EcogSPMem`, `EcogPtMem`,`EcogPtLang`,`EcogSPPlan`), Functional Activities Questionnaire in Older Adults with Dementia(`FAQ`), Alzheimer’s Disease Assessment Scale(`ADAS13`) and biosample test(`CSF_TAU`) only need to be checked at the first visit.
 
-- The factors that are significant in their slopes are: `AV45_slope`,`EcogSPLang_slope`, `EcogPtLang_slope`, `WholeBrain_slope`, `MidTemp_slope`, `Fusiform_slope`, `FDG_slope`,`RAVLT_perc_forgetting_slope` and `ICV_slope`, which means the change in these parameters within two years after the first visit is quite important for the diagnosis. So testing these parameters on each subsequent visit is necessary. Specifically, The tests that need to be conducted in every visit are **Ecog** (Everyday Cognition)test,**AV45** test, **FDG** imaging test, **RAVLT_learning** test and **MRI** test.
+- The factors that are significant in their slopes are: `AV45_slope`, `EcogSPLang_slope`, `WholeBrain_slope`, `MidTemp_slope`, `Fusiform_slope`, `FDG_slope`, `RAVLT_perc_forgetting_slope` and `ICV_slope`, which mean that the change in these parameters within two years after the first visit is quite important for the diagnosis. So checking these parameters on each subsequent visit is necessary. Specifically, The tests that need to be conducted in every visit are **Ecog** (Everyday Cognition)test on study partner language, **AV45** test, **FDG** imaging test, **RAVLT_learning** test and **MRI** test.
 
-- Other significant demographic factors are: `PTAGE`(age), `PTMARRY_Married`, `PTMARRY_Never_married`, `PTETHCAT_Not_Hisp/Latino`, `PTRACCAT_Unknown`, and `PTRACCAT_Hawaiian/Other_PI`. 
+- Other significant demographic factors are: `PTAGE`(age), `PTMARRY_Married`, `PTMARRY_Never_married` (marital status), `PTETHCAT_Not_Hisp/Latino`, `PTRACCAT_Unknown`, and `PTRACCAT_Hawaiian/Other_PI` (ethnicity and race). 
 
 
-Remarkably, `MMSE` appears in the all the variable selection procedures above. So we can conclude that it's a very essetial test in diagnosis of AD.
+Remarkably, `MMSE` appears in the results of all variable selection methods shown above. So we can conclude that it's an essetial test in the diagnosis of AD.

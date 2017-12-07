@@ -1899,7 +1899,7 @@ for rid in adnimerge_unique.index:
 
 ## Rearrange and Export
 
-After initial date cleaning, we have 783 observations, one for each patient. To improve readablity, we ordered the columns in a way that the slope of a predictor follows the predictor itself. We output the data to a csv file for further analysis and modeling.
+After initial date cleaning, we have 783 observations, one for each patient. To improve readablity, we ordered the columns in a way that the slope of a predictor followed the predictor itself. We output the data to a csv file for further analysis and modeling.
 
 
 

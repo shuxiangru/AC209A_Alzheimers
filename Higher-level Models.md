@@ -736,4 +736,4 @@ score_df
 
 The optimal hidden layer size is 1 hidden layer with 200 neurons. We need a l2-regularization term with value 3 to achieve the best accuracy.
 
-The overall test accuracy of neural networks is better than that of the best random forest in the previous model comparison section. It also has a significantly higher accuracy on `CN`, while its accuracy on `CI` and `AD` is slightly lower. We would say that neural networks belong to the group of Type III classifiers discussed in the previous section. It is also a very promising model.
+The overall test accuracy of neural networks is better than that of random forest classifier. It also has a significantly higher accuracy on `CN` cognitively normal people, while its accuracies on `CI` cognitive impairment and `AD` Alzheimer's disease are slightly lower. We would say that the neural networks model belongs to the group of Type III classifiers discussed in the previous section. It is also a very promising model.
