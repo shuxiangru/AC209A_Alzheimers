@@ -10,9 +10,11 @@ nav_include: 5
 {: toc}
 
 
+
 ```python
 import numpy as np
 import pandas as pd
+from sklearn.dummy import DummyClassifier
 from sklearn.linear_model import LogisticRegressionCV
 from sklearn.linear_model import LogisticRegression
 import sklearn.metrics as metrics
@@ -25,6 +27,8 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import KFold
+from sklearn.metrics import confusion_matrix
 import warnings
 warnings.filterwarnings('ignore')
 ```
@@ -53,7 +57,6 @@ y_test = df_test['DX_bl'].copy()
 
 
 ```python
-# function to help compare the accuracy of models
 def score(model, X_train, y_train, X_test, y_test):
     train_acc = model.score(X_train,y_train)
     test_acc = model.score(X_test,y_test)
@@ -66,6 +69,30 @@ def score(model, X_train, y_train, X_test, y_test):
 ```
 
 
+## Baseline Model
+
+We used `stratified` strategy to generate predictions as a simple baseline to compare with other classifiers we learned in class.
+
+
+
+```python
+dc = DummyClassifier(strategy='stratified', random_state=9001)
+dc.fit(X_train,y_train)
+print('Dummy Classifier Training Score: ', dc.score(X_train,y_train))
+print('Dummy Classifier Test Score: ', dc.score(X_test,y_test))
+print('Dummy Classifier Confusion Matrix:\n', confusion_matrix(y_test,dc.predict(X_test)))
+dc_score = score(dc, X_train, y_train, X_test, y_test)
+```
+
+
+    Dummy Classifier Training Score:  0.423510466989
+    Dummy Classifier Test Score:  0.444444444444
+    Dummy Classifier Confusion Matrix:
+     [[14 19  9]
+     [27 52 14]
+     [ 7 14  6]]
+
+
 ## Logistic Regression
 
 We tested 6 kinds of logistic regression, logistic regression with l1 penalty, logistic regression with l2 penalty, unweighted logistic regression, weighted logistic regression, one-vs-rest logistic regression and multinomial logistic regression. We chose the best parameters with cross validation. We found that unless we used weighted logistic regression, we need a large regularization term. However, the accuracy of weighted logistic regression is very low compared to the others. That indicates that we have too many variables.
@@ -74,27 +101,27 @@ We tested 6 kinds of logistic regression, logistic regression with l1 penalty, l
 
 ```python
 #l1
-log_l1 = LogisticRegressionCV(penalty = 'l1', solver = 'liblinear')
+log_l1 = LogisticRegressionCV(penalty = 'l1', solver = 'liblinear', random_state=9001)
 log_l1.fit(X_train,y_train)
 
 #l2
-log_l2 = LogisticRegressionCV(penalty = 'l2')
+log_l2 = LogisticRegressionCV(penalty = 'l2', random_state=9001)
 log_l2.fit(X_train,y_train)
 
 #Unweighted logistic regression
-unweighted_logistic = LogisticRegressionCV()
+unweighted_logistic = LogisticRegressionCV(random_state=9001)
 unweighted_logistic.fit(X_train,y_train)
 
 #Weighted logistic regression
-weighted_logistic = LogisticRegressionCV(class_weight='balanced')
+weighted_logistic = LogisticRegressionCV(class_weight='balanced', random_state=9001)
 weighted_logistic.fit(X_train,y_train)
 
 #ovr
-log_ovr = LogisticRegressionCV(multi_class = 'ovr')
+log_ovr = LogisticRegressionCV(multi_class = 'ovr', random_state=9001)
 log_ovr.fit(X_train,y_train)
 
 #multinomial
-log_multinomial = LogisticRegressionCV(multi_class = 'multinomial', solver = 'newton-cg')
+log_multinomial = LogisticRegressionCV(multi_class = 'multinomial', solver = 'newton-cg', random_state=9001)
 log_multinomial.fit(X_train,y_train)
 
 print("Regularization strength: ")
@@ -113,7 +140,7 @@ print("Multinomial logistic regression: ", log_multinomial.C_[0])
     Logistic regression with l1 penalty: 2.78255940221
     Logistic regression with l2 penalty: 0.35938136638
     Unweighted logistic regression:  0.35938136638
-    Weighted logistic regression:  1291.54966501
+    Weighted logistic regression:  166.81005372
     OVR logistic regression:  0.35938136638
     Multinomial logistic regression:  21.5443469003
 
@@ -138,7 +165,7 @@ print("Test accuracy")
 print("-------------------------------------------------")
 print('Logistic Regression with l1 penalty test Score: ',log_l1.score(X_test, y_test))
 print('Logistic Regression with l2 penalty test Score: ',log_l2.score(X_test, y_test))
-print('Unweighted Logistic Regression with test Score: ',unweighted_logistic.score(X_test, y_test))
+print('Unweighted Logistic Regression test Score: ',unweighted_logistic.score(X_test, y_test))
 print('Weighted Logistic Regression test Score: ',weighted_logistic.score(X_test, y_test))
 print('OVR Logistic Regression test Score: ',log_ovr.score(X_test, y_test))
 print('Multinomial Logistic Regression test Score: ',log_multinomial.score(X_test, y_test))
@@ -147,28 +174,27 @@ print('Multinomial Logistic Regression test Score: ',log_multinomial.score(X_tes
 
     Training accuracy
     -------------------------------------------------
-    Logistic Regression with l1 penalty train Score:  0.829307568438
-    Logistic Regression with l2 penalty train Score:  0.618357487923
-    Unweighted Logistic Regression with train Score:  0.618357487923
-    Weighted Logistic Regression train Score:  0.484702093398
-    OVR Logistic Regression train Score:  0.618357487923
-    Multinomial Logistic Regression train Score:  0.840579710145
+    Logistic Regression with l1 penalty train Score:  0.82769726248
+    Logistic Regression with l2 penalty train Score:  0.615136876006
+    Unweighted Logistic Regression with train Score:  0.615136876006
+    Weighted Logistic Regression train Score:  0.478260869565
+    OVR Logistic Regression train Score:  0.615136876006
+    Multinomial Logistic Regression train Score:  0.843800322061
     
     
     Test accuracy
     -------------------------------------------------
     Logistic Regression with l1 penalty test Score:  0.783950617284
-    Logistic Regression with l2 penalty test Score:  0.592592592593
-    Unweighted Logistic Regression with test Score:  0.592592592593
-    Weighted Logistic Regression test Score:  0.425925925926
-    OVR Logistic Regression test Score:  0.592592592593
-    Multinomial Logistic Regression test Score:  0.746913580247
+    Logistic Regression with l2 penalty test Score:  0.586419753086
+    Unweighted Logistic Regression test Score:  0.586419753086
+    Weighted Logistic Regression test Score:  0.388888888889
+    OVR Logistic Regression test Score:  0.586419753086
+    Multinomial Logistic Regression test Score:  0.753086419753
 
 
 
 
 ```python
-# store the accuracy score
 l1_score = score(log_l1, X_train, y_train, X_test, y_test)
 l2_score = score(log_l2, X_train, y_train, X_test, y_test)
 weighted_score = score(weighted_logistic, X_train, y_train, X_test, y_test)
@@ -178,6 +204,59 @@ multi_score = score(log_multinomial, X_train, y_train, X_test, y_test)
 ```
 
 
+
+
+```python
+l1_pred = log_l1.predict(X_test)
+l2_pred = log_l2.predict(X_test)
+weighted_pred = weighted_logistic.predict(X_test)
+unweighted_pred = unweighted_logistic.predict(X_test)
+ovr_pred = log_ovr.predict(X_test)
+multi_pred = log_multinomial.predict(X_test)
+
+print("Confusion Matrix")
+print("Logistic Regression with l1 penalty:\n",
+      confusion_matrix(y_test, l1_pred))
+print("Logistic Regression with l2 penalty:\n",
+      confusion_matrix(y_test, l2_pred))
+print("Unweighted Logistic Regression:\n",
+      confusion_matrix(y_test, unweighted_pred))
+print("Weighted Logistic Regression:\n",
+      confusion_matrix(y_test, weighted_pred))
+print("OVR Logistic Regression:\n",
+      confusion_matrix(y_test, ovr_pred))
+print("Multinomial Logistic Regression:\n",
+      confusion_matrix(y_test, multi_pred))
+```
+
+
+    Confusion Matrix
+    Logistic Regression with l1 penalty:
+     [[24 18  0]
+     [10 80  3]
+     [ 0  4 23]]
+    Logistic Regression with l2 penalty:
+     [[ 0 42  0]
+     [ 0 85  8]
+     [ 0 17 10]]
+    Unweighted Logistic Regression:
+     [[ 0 42  0]
+     [ 0 85  8]
+     [ 0 17 10]]
+    Weighted Logistic Regression:
+     [[32  6  4]
+     [52 13 28]
+     [ 2  7 18]]
+    OVR Logistic Regression:
+     [[ 0 42  0]
+     [ 0 85  8]
+     [ 0 17 10]]
+    Multinomial Logistic Regression:
+     [[28 14  0]
+     [17 71  5]
+     [ 0  4 23]]
+
+
 ## Discriminant Analysis
 
 We performed normalization on continuous predictors and used Linear Discriminant Analysis (LDA) and Quadratic Discriminant Analysis (QDA) as our models. LDA performs really well.
@@ -185,7 +264,6 @@ We performed normalization on continuous predictors and used Linear Discriminant
 
 
 ```python
-# normalization
 cols_standardize = [
     c for c in X_train.columns 
     if (not c.startswith('PT')) or (c=='PTEDUCAT')]
@@ -389,7 +467,6 @@ qda = QuadraticDiscriminantAnalysis()
 lda.fit(X_train_std,y_train)
 qda.fit(X_train_std,y_train)
 
-# training accuracy
 print("Training accuracy")
 print("------------------")
 print('LDA Train Score: ',lda.score(X_train_std,y_train))
@@ -397,7 +474,6 @@ print('QDA Train Score: ',qda.score(X_train_std,y_train))
 
 print('\n')
 
-# test accuracy
 print("Test accuracy")
 print("------------------")
 print('LDA Test Score: ',lda.score(X_test_std,y_test))
@@ -420,10 +496,34 @@ print('QDA Test Score: ',qda.score(X_test_std,y_test))
 
 
 ```python
-# store the accuracy score
 lda_score = score(lda, X_train_std, y_train, X_test_std, y_test)
 qda_score = score(qda, X_train_std, y_train, X_test_std, y_test)
 ```
+
+
+
+
+```python
+lda_pred = lda.predict(X_test_std)
+qda_pred = qda.predict(X_test_std)
+
+print("Confusion Matrix")
+print("LDA:\n",
+      confusion_matrix(y_test, lda_pred))
+print("QDA:\n",
+      confusion_matrix(y_test, qda_pred))
+```
+
+
+    Confusion Matrix
+    LDA:
+     [[26 16  0]
+     [ 9 79  5]
+     [ 1  2 24]]
+    QDA:
+     [[29 13  0]
+     [12 66 15]
+     [ 0  6 21]]
 
 
 ## K-Nearest Neighbours
@@ -433,12 +533,14 @@ The optimal number of neighbours is 37, which is a relatively large number consi
 
 
 ```python
+cv_fold = KFold(n_splits=5, shuffle=True, random_state=9001)
+
 max_score = 0
 max_k = 0 
 
 for k in range(1,60):
     knn = KNeighborsClassifier(n_neighbors = k)
-    knn_val_score = cross_val_score(knn, X_train, y_train).mean()
+    knn_val_score = cross_val_score(knn, X_train, y_train, cv=cv_fold).mean()
     if knn_val_score > max_score:
         max_k = k
         max_score = knn_val_score
@@ -447,31 +549,46 @@ knn = KNeighborsClassifier(n_neighbors = max_k)
 knn.fit(X_train,y_train)
 
 print("Optimal number of neighbours: ", max_k)
-print('KNN Train Score: ', knn.score(X_train,y_train))
-print('KNN Test Score: ', knn.score(X_test,y_test))
+print('KNN Training Accuracy: ', knn.score(X_train,y_train))
+print('KNN Test Accuracy: ', knn.score(X_test,y_test))
 
-# Store the accuracy score
 knn_score = score(knn, X_train, y_train, X_test, y_test)
 ```
 
 
-    Optimal number of neighbours:  37
-    KNN Train Score:  0.566827697262
-    KNN Test Score:  0.592592592593
+    Optimal number of neighbours:  41
+    KNN Training Accuracy:  0.566827697262
+    KNN Test Accuracy:  0.574074074074
+
+
+
+
+```python
+knn_pred = knn.predict(X_test)
+
+print("KNN Confusion Matrix:\n",
+      confusion_matrix(y_test, knn_pred))
+```
+
+
+    KNN Confusion Matrix:
+     [[ 0 42  0]
+     [ 0 92  1]
+     [ 1 25  1]]
 
 
 ## Decision Tree
 
-We used 5-fold cross validation to find the optimal depth for the decision tree. The optimal depth is 4.
+We used 5-fold cross validation to find the optimal depth for the decision tree. The optimal depth is 6.
 
 
 
 ```python
 depth = []
 for i in range(3,20):
-    dt = DecisionTreeClassifier(max_depth=i)
+    dt = DecisionTreeClassifier(max_depth=i, random_state=9001)
     # Perform 5-fold cross validation 
-    scores = cross_val_score(estimator=dt, X=X_train, y=y_train, cv=5, n_jobs=-1)
+    scores = cross_val_score(estimator=dt, X=X_train, y=y_train, cv=cv_fold, n_jobs=-1)
     depth.append((i, scores.mean(), scores.std())) 
 depthvals = [t[0] for t in depth]
 cvmeans = np.array([t[1] for t in depth])
@@ -479,25 +596,41 @@ cvstds = np.array([t[2] for t in depth])
 max_indx = np.argmax(cvmeans)
 md_best = depthvals[max_indx]
 print('Optimal depth:',md_best)
-dt_best = DecisionTreeClassifier(max_depth=md_best)
+dt_best = DecisionTreeClassifier(max_depth=md_best, random_state=9001)
 dt_best.fit(X_train, y_train).score(X_test, y_test)
 dt_score = score(dt_best, X_train, y_train, X_test, y_test)
 ```
 
 
-    Optimal depth: 4
+    Optimal depth: 6
 
 
 
 
 ```python
-print('Decision Tree Train Score: ', dt_best.score(X_train,y_train))
-print('Decision Tree Test Score: ', dt_best.score(X_test,y_test))
+print('Decision Tree Training Accuracy: ', dt_best.score(X_train,y_train))
+print('Decision Tree Test Accuracy: ', dt_best.score(X_test,y_test))
 ```
 
 
-    Decision Tree Train Score:  0.818035426731
-    Decision Tree Test Score:  0.746913580247
+    Decision Tree Training Accuracy:  0.90499194847
+    Decision Tree Test Accuracy:  0.734567901235
+
+
+
+
+```python
+dt_pred = dt_best.predict(X_test)
+
+print("Decision Tree Confusion Matrix:\n",
+      confusion_matrix(y_test, dt_pred))
+```
+
+
+    Decision Tree Confusion Matrix:
+     [[24 18  0]
+     [21 71  1]
+     [ 0  3 24]]
 
 
 ## Random Forest
@@ -511,28 +644,44 @@ trees = [2**x for x in range(8)]  # 1, 2, 4, 8, 16, 32, ...
 depth = [2, 4, 6, 8, 10]
 parameters = {'n_estimators': trees,
               'max_depth': depth}
-rf = RandomForestClassifier()
-rf_cv = GridSearchCV(rf, parameters)
+rf = RandomForestClassifier(random_state=9001)
+rf_cv = GridSearchCV(rf, parameters, cv=cv_fold)
 rf_cv.fit(X_train, y_train)
 best_score = np.argmax(rf_cv.cv_results_['mean_test_score'])
 result = rf_cv.cv_results_['params'][best_score]
 opt_depth = result['max_depth']
 opt_tree = result['n_estimators']
 print("Optimal number of trees {}, tree depth: {}".format(opt_tree, opt_depth))
-rf = RandomForestClassifier(n_estimators=opt_tree, max_depth=opt_depth)
+rf = RandomForestClassifier(n_estimators=opt_tree, max_depth=opt_depth, random_state=9001)
 rf.fit(X_train, y_train)
 print('\n')
-print('Random Forest Train Score: ', rf.score(X_train,y_train))
-print('Random Forest Test Score: ', rf.score(X_test,y_test))
+print('Random Forest Training Accuracy: ', rf.score(X_train,y_train))
+print('Random Forest Test Accuracy: ', rf.score(X_test,y_test))
 rf_score = score(rf, X_train, y_train, X_test, y_test)
 ```
 
 
-    Optimal number of trees 32, tree depth: 10
+    Optimal number of trees 16, tree depth: 8
     
     
-    Random Forest Train Score:  0.987117552335
-    Random Forest Test Score:  0.796296296296
+    Random Forest Training Accuracy:  0.972624798712
+    Random Forest Test Accuracy:  0.796296296296
+
+
+
+
+```python
+rf_pred = rf.predict(X_test)
+
+print("Random Forest Confusion Matrix:\n",
+      confusion_matrix(y_test, rf_pred))
+```
+
+
+    Random Forest Confusion Matrix:
+     [[20 22  0]
+     [ 4 87  2]
+     [ 0  5 22]]
 
 
 ## AdaBoost
@@ -546,8 +695,9 @@ trees = [2**x for x in range(6)]  # 1, 2, 4, 8, 16, 32, ...
 learning_rate = [0.1, 0.5, 1, 5]
 parameters = {'n_estimators': trees,
               'learning_rate': learning_rate}
-ab = AdaBoostClassifier(DecisionTreeClassifier(max_depth=md_best))
-ab_cv = GridSearchCV(ab, parameters)
+ab = AdaBoostClassifier(DecisionTreeClassifier(max_depth=md_best),
+                        random_state=9001)
+ab_cv = GridSearchCV(ab, parameters, cv=cv_fold)
 ab_cv.fit(X_train, y_train)
 best_score = np.argmax(ab_cv.cv_results_['mean_test_score'])
 result = ab_cv.cv_results_['params'][best_score]
@@ -555,20 +705,37 @@ opt_learning_rate = result['learning_rate']
 opt_tree = result['n_estimators']
 print("Optimal number of trees {}, learning rate: {}".format(opt_tree, opt_learning_rate))
 ab = AdaBoostClassifier(DecisionTreeClassifier(max_depth=md_best), n_estimators=opt_tree,
-                       learning_rate=opt_learning_rate)
+                       learning_rate=opt_learning_rate, random_state=9001)
 ab.fit(X_train, y_train)
 print('\n')
-print('AdaBoost Train Score: ', ab.score(X_train,y_train))
-print('AdaBoost Test Score: ', ab.score(X_test,y_test))
+print('AdaBoost Training Accuracy: ', ab.score(X_train,y_train))
+print('AdaBoost Test Accuracy: ', ab.score(X_test,y_test))
 ab_score = score(ab, X_train, y_train, X_test, y_test)
 ```
 
 
-    Optimal number of trees 16, learning rate: 0.1
+    Optimal number of trees 16, learning rate: 1
     
     
-    AdaBoost Train Score:  0.864734299517
-    AdaBoost Test Score:  0.753086419753
+    AdaBoost Training Accuracy:  1.0
+    AdaBoost Test Accuracy:  0.777777777778
+
+
+
+
+```python
+ab_pred = ab.predict(X_test)
+
+print("AdaBoost Confusion Matrix:\n",
+      confusion_matrix(y_test, ab_pred))
+```
+
+
+    AdaBoost Confusion Matrix:
+     [[22 20  0]
+     [ 7 80  6]
+     [ 0  3 24]]
+
 
 
 ## Performance Summary
@@ -576,7 +743,21 @@ ab_score = score(ab, X_train, y_train, X_test, y_test)
 
 
 ```python
-score_df = pd.DataFrame({'Logistic Regression with l1': l1_score, 
+import matplotlib
+import matplotlib.pyplot as plt
+%matplotlib inline
+
+import seaborn as sns
+sns.set_style('white')
+sns.set_context('paper', font_scale=1.5)
+```
+
+
+
+
+```python
+score_df = pd.DataFrame({'Dummy Classifier': dc_score,
+                         'Logistic Regression with l1': l1_score, 
                          'Logistic Regression with l2': l2_score,
                          'Weighted logistic': weighted_score,
                          'Unweighted logistic': unweighted_score,
@@ -615,6 +796,7 @@ score_df
       <th></th>
       <th>AdaBoost</th>
       <th>Decision Tree</th>
+      <th>Dummy Classifier</th>
       <th>KNN</th>
       <th>LDA</th>
       <th>Logistic Regression with l1</th>
@@ -630,76 +812,81 @@ score_df
   <tbody>
     <tr>
       <th>Train accuracy</th>
-      <td>0.864734</td>
-      <td>0.818035</td>
+      <td>1.000000</td>
+      <td>0.904992</td>
+      <td>0.423510</td>
       <td>0.566828</td>
       <td>0.853462</td>
-      <td>0.829308</td>
-      <td>0.618357</td>
-      <td>0.840580</td>
-      <td>0.618357</td>
+      <td>0.827697</td>
+      <td>0.615137</td>
+      <td>0.843800</td>
+      <td>0.615137</td>
       <td>0.816425</td>
-      <td>0.987118</td>
-      <td>0.618357</td>
-      <td>0.484702</td>
+      <td>0.972625</td>
+      <td>0.615137</td>
+      <td>0.478261</td>
     </tr>
     <tr>
       <th>Test accuracy</th>
-      <td>0.753086</td>
-      <td>0.746914</td>
-      <td>0.592593</td>
+      <td>0.777778</td>
+      <td>0.734568</td>
+      <td>0.444444</td>
+      <td>0.574074</td>
       <td>0.796296</td>
       <td>0.783951</td>
-      <td>0.592593</td>
-      <td>0.746914</td>
-      <td>0.592593</td>
+      <td>0.586420</td>
+      <td>0.753086</td>
+      <td>0.586420</td>
       <td>0.716049</td>
       <td>0.796296</td>
-      <td>0.592593</td>
-      <td>0.425926</td>
+      <td>0.586420</td>
+      <td>0.388889</td>
     </tr>
     <tr>
       <th>Test accuracy CN</th>
-      <td>0.380952</td>
-      <td>0.476190</td>
-      <td>0.023810</td>
+      <td>0.523810</td>
+      <td>0.571429</td>
+      <td>0.333333</td>
+      <td>0.000000</td>
       <td>0.619048</td>
       <td>0.571429</td>
       <td>0.000000</td>
-      <td>0.642857</td>
+      <td>0.666667</td>
       <td>0.000000</td>
       <td>0.690476</td>
-      <td>0.571429</td>
+      <td>0.476190</td>
       <td>0.000000</td>
-      <td>0.833333</td>
+      <td>0.761905</td>
     </tr>
     <tr>
       <th>Test accuracy CI</th>
-      <td>0.913978</td>
-      <td>0.838710</td>
+      <td>0.860215</td>
+      <td>0.763441</td>
+      <td>0.516129</td>
       <td>0.989247</td>
       <td>0.849462</td>
       <td>0.860215</td>
-      <td>0.924731</td>
+      <td>0.913978</td>
       <td>0.763441</td>
-      <td>0.924731</td>
+      <td>0.913978</td>
       <td>0.709677</td>
-      <td>0.870968</td>
-      <td>0.924731</td>
-      <td>0.172043</td>
+      <td>0.935484</td>
+      <td>0.913978</td>
+      <td>0.139785</td>
     </tr>
     <tr>
       <th>Test accuracy AD</th>
-      <td>0.777778</td>
-      <td>0.851852</td>
-      <td>0.111111</td>
+      <td>0.888889</td>
+      <td>0.888889</td>
+      <td>0.222222</td>
+      <td>0.037037</td>
       <td>0.888889</td>
       <td>0.851852</td>
       <td>0.370370</td>
       <td>0.851852</td>
       <td>0.370370</td>
       <td>0.777778</td>
-      <td>0.888889</td>
+      <td>0.814815</td>
       <td>0.370370</td>
       <td>0.666667</td>
     </tr>
@@ -709,12 +896,70 @@ score_df
 
 
 
-Based on the above summary, Random Forest Classifier has a very high train accuracy which is close to 1(0.987118), and it also has the highest accuracy(0.796296) on the test set. AdaBoost Classifier ranks second on the train accuracy(0.864734). LDA and Random Forest Classifier have the highest test accuracy(0.796296), and logistic regression with l1 regularization is the third highest(0.783951).
 
-For classifying `CN` patients, weighted logistic regression has the highest test accuracy(0.833333), so it performed the best for determining Cognitively Normal patients. However, logistic regression with l2 regularization, OvR logistic regression and unweighted logistic regression have zero accuracy on classifying `CN` patients. Since all of them have very high accuracy on `CI` but low accuracy on `AD`, we think these three models probably classified all the `CN` patients into `AD` which leads to zero accuracy on `CN` and low accuracy on `AD`.
 
-KNN has the highest test accuracy(0.989247) on diagnosing `CI` cognitive impairment patients. AdaBoost Classifier, logistic regression with l2 regularization, OvR logistic regression and unweighted logistic regression all reached 0.9 accuracy on diagnosing `CI` patients.
+```python
+names_sorted = [
+    pair[0] for pair in sorted(
+        zip(score_df.columns, score_df.loc['Test accuracy']), 
+        key=lambda x:x[1], reverse=False) ]
+names_ticks = [
+    n.replace(' ','\n') for n in names_sorted ]
+```
 
-Since we focus on the diagnosis of Alzheimer's disease, we are more concerned about the test accuracy on `AD` patients. LDA and Random Forest Classifier have the highest test accuracy(0.888889) on `AD` patients. Logistic regression with l1 regularization, decision tree and multinomial logistic regression all reached test accuracy of over 0.85 on the classification of `AD`.
 
-To conclude, Random Forest Classifier and LDA performed the best if we are only concerned about diagnosing `AD` patients. However, Random Forest has the best performance overall. 
+
+
+```python
+bar_width = 0.3
+plt.figure(figsize = (16,10))
+for i,idx in enumerate(score_df.index[:2]):
+    plt.bar(np.arange(len(names_sorted))+i*bar_width, score_df[names_sorted].loc[idx], 
+            bar_width, color=sns.color_palette()[i], label=idx)
+plt.xticks(np.arange(len(names_sorted))+0.15, names_ticks)
+plt.ylabel('Overall Classification Accuracy')
+plt.xlabel('Classifiers')
+plt.legend(loc='best')
+plt.ylim(0,1)
+plt.show()
+```
+
+
+
+![png](Classification%20Models%20and%20Their%20Performance_files/Classification%20Models%20and%20Their%20Performance_42_0.png)
+
+
+
+
+```python
+bar_width = 0.3
+plt.figure(figsize = (16,10))
+for i,idx in enumerate(score_df.index[2:]):
+    plt.bar(1.2*np.arange(len(names_sorted))+i*bar_width, score_df[names_sorted].loc[idx], 
+            bar_width, color=sns.color_palette()[i+2], label=idx)
+plt.xticks(1.2*np.arange(len(names_sorted))+0.3, names_ticks)
+plt.ylabel('Classification Accuracy on Each Class')
+plt.xlabel('Classifiers')
+plt.legend(loc='best')
+plt.ylim(0,1)
+plt.show()
+```
+
+
+
+![png](Classification%20Models%20and%20Their%20Performance_files/Classification%20Models%20and%20Their%20Performance_43_0.png)
+
+
+For baseline models, people usually use the dummy classifier with "stratified" strategy or the "most frequent" strategy. The "stratified" method generates prediction according to the class distribution of the training set. The "most frequent" strategy always predicts the most frequent class. We adopted the `stratified` strategy implemented by `sklearn`'s `DummyClassifer` as the baseline model. As can be seen above, all other classification models we used outperformed the dummy classifier as expected.
+
+Based on the above summary, AdaBoost has a very high training accuracy 100%. Random forest classifier has the second highest training accuracy which is close to 1 (0.972625), and it also has the highest accuracy (0.796296) on the test set. LDA has the same test accuracy (0.796296) as random forest classifier, and logistic regression with l1 regularization is the third highest (0.783951).
+
+For classifying `CN` patients, weighted logistic regression has the highest test accuracy (0.833333), so it performs the best for determining Cognitively Normal patients. However, KNN, logistic regression with l2 regularization, OvR logistic regression and unweighted logistic regression have zero accuracy on classifying `CN` patients. Since all of them have very high accuracy on `CI` but low accuracy on `AD`, we think these four models probably classify almost all the `CN` patients into `CI` (as can been seen in the confusion matrix), leading to zero accuracy on `CN` and high accuracy on `CI`.
+
+KNN has the highest test accuracy (0.989247) on diagnosing `CI` cognitive impairment patients. Logistic regression with l2 regularization, random forest classifier, OvR logistic regression and unweighted logistic regression all reach 0.9 accuracy on diagnosing `CI` patients.
+
+Since we focus on the diagnosis of Alzheimer's disease, we are more concerned about the test accuracy on `AD` patients. AdaBoost, LDA and decision tree classifier have the highest test accuracy(0.888889) on `AD` patients. Logistic regression with l1 regularization, random forest classifier and multinomial logistic regression all achieve test accuracy of over 0.8 on the classification of `AD`.
+
+In addition, we find an interesting pattern in the above barplots of accuracy. There seems to be three types of classifiers. Type I includes `Weighted Logistic` and `Dummy Classifier`. Their overall accuracies are at a relatively low level around 0.40. Type II includes `KNN`, `Logistic Regression with l2`, `OvR` and `Unweighted Logistic`. Their overall accuracies are at a midium level around 0.60, and their partial accuracies on the three classes are very unbalanced. None of them can predict correctly on `CN`. Type III includes `QDA`, `Decision Tree`, `Multinomial`, `AdaBoost`, `Logistic Regression with l1`, `LDA` and `Random Forest`. Their overall accuracies are at a relatively high level over 0.70, and their partial accuracies on the three classes are basically balanced. Among Type III classifiers, though `QDA` has the lowest overall accuracy, its partial accuracies are the most balanced. Every Type III classifier has its own advantage and can be competitive substitution to each other.
+
+To conclude, `Random Forest` and `LDA` performed the best if we are concerned about both overall test accuracy and correctly diagnosing `AD` patients. Other models such as `QDA`, `Decision Tree`, `Multinomial`, `AdaBoost` and `Logistic Regression with l1` are also promising.

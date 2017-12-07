@@ -655,7 +655,7 @@ print('other patients:', num_other)
 We plotted histograms for each predictor to look at the distribution of each category. To better classify Alzheimer's Disease, we would like to know the relationship of each variable and the diagnosis. In addition, we would like to know how much data is missing in each category of diagnosis and find the best imputing method based on the result.
 
 Here are some noteworthy findings:
-- `CDRSB`: All the cognitive normal `CN` patients have a value close to 0. As the value increases, it is more likely that the patient has Alzheimer’s disease. Cognitive impairment and Alzheimer’s Disease `AD` patients can have different values for these two variables. That shows if the value is not 0, then the patient is experiencing some sort of dementia. This could be a very strong predictor. However, `CDRSB` is actively used to deduce DX and will erroneously inflate accuracy. We decided to delete this variable along with its slope.
+- `CDRSB`: All the cognitively normal `CN` patients have a value close to 0. As the value increases, it is more likely that the patient has Alzheimer’s disease. Cognitive impairment and Alzheimer’s Disease `AD` patients can have different values for these two variables. That shows if the value is not 0, then the patient is experiencing some sort of dementia. This could be a very strong predictor. However, `CDRSB` is actively used to deduce DX and will erroneously inflate accuracy. We decided to delete this variable along with its slope.
 - `ADAS13`, `CSF_TAU` and `EcogSPMem`: From the plot, it seems that as the value increases, the likelihood of `AD` also increases. It indicates high values are associated with Alzheimer’s Disease. Three categories are well separated.
 - `RAVLT_immediate` and `Hippocampus` have negative relationship with Alzheimer’s. As the value of these variables decreases, it is more likely to get AD.
 - The missing rate is very low overall. For the predictors that have missing values, the precentage of missing value is similar across each category.
@@ -682,7 +682,7 @@ for i,col_name in enumerate(cols_cont_bl):
         label='{:^4} ({:0.0f}%)'.format('CN', 100*(1-mis_rate_CN)))
     adnimerge_unique_MC[col_name].hist(
         ax=ax[i,0], alpha=0.4, 
-        label='{:^4} ({:0.0f}%)'.format('MC', 100*(1-mis_rate_MC)))
+        label='{:^4} ({:0.0f}%)'.format('CI', 100*(1-mis_rate_MC)))
     adnimerge_unique_AD[col_name].hist(
         ax=ax[i,0], alpha=0.4, 
         label='{:^4} ({:0.0f}%)'.format('AD', 100*(1-mis_rate_AD)))
@@ -698,7 +698,7 @@ for i,col_name in enumerate(cols_cont_slope):
         label='{:^4} ({:0.0f}%)'.format('CN', 100*(1-mis_rate_CN)))
     adnimerge_unique_MC[col_name].hist(
         ax=ax[i,1], alpha=0.4, 
-        label='{:^4} ({:0.0f}%)'.format('MC', 100*(1-mis_rate_MC)))
+        label='{:^4} ({:0.0f}%)'.format('CI', 100*(1-mis_rate_MC)))
     adnimerge_unique_AD[col_name].hist(
         ax=ax[i,1], alpha=0.4, 
         label='{:^4} ({:0.0f}%)'.format('AD', 100*(1-mis_rate_AD)))
@@ -762,7 +762,7 @@ fig.colorbar(plot)
 
 
 
-    <matplotlib.colorbar.Colorbar at 0x1a1c54fcc0>
+    <matplotlib.colorbar.Colorbar at 0x1a1aad6d30>
 
 
 
@@ -806,7 +806,7 @@ fig.colorbar(plot)
 
 
 
-    <matplotlib.colorbar.Colorbar at 0x1a14321cf8>
+    <matplotlib.colorbar.Colorbar at 0x1a1accf3c8>
 
 
 
@@ -828,7 +828,7 @@ fig.colorbar(plot)
 
 
 
-    <matplotlib.colorbar.Colorbar at 0x1a1ec92cc0>
+    <matplotlib.colorbar.Colorbar at 0x1a242bccc0>
 
 
 
