@@ -26,9 +26,3 @@ In the modeling process, we tried almost all classification models we learned in
 [6] Weiner, Michael W. "Recent Publications from the Alzheimer's 
 Disease Neuroimaging Initiative: Reviewing Progress toward Improved AD Clinical Trials." Alzheimer's & Dementia, Elsevier, 22 Mar. 2017.
 
-
-
-### Reference
-[1]. Young, Alexandra L., et al. "A Data-Driven Model Of Biomarker Changes In Sporadic Alzheimer's Disease." Alzheimer's & Dementia, vol. 10, no. 4, 2014, doi:10.1016/j.jalz.2014.04.180.
-[2]. Moradi, Elaheh et al. "Rey's Auditory Verbal Learning Test Scores Can Be Predicted from Whole Brain MRI in Alzheimer's Disease." NeuroImage : Clinical13 (2017): 415–427. PMC. Web. 26 Nov. 2017.
-[3]. Weiner, Michael W. "Recent Publications from the Alzheimer's Disease Neuroimaging Initiative: Reviewing Progress toward Improved AD Clinical Trials." Alzheimer's & Dementia, Elsevier, 22 Mar. 2017.
